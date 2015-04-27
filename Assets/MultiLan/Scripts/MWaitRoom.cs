@@ -67,7 +67,7 @@ public class MWaitRoom : MonoBehaviour {
 	void Start(){
 		Instantiate(Resources.Load("MGameMenu"));
 		text = GameObject.Find ("MText").GetComponent<MText>(); // Get the menu script
-		parameters = GameObject.Find ("MGameParameter").GetComponent<MGameParameter>(); // Get the menu script
+        parameters = GameObject.Find("LevelOption").GetComponent<MGameParameter>(); // Get the menu script
 		networkSrc = GameObject.Find ("MNetwork").GetComponent<MNetwork>(); // Get the menu script
 		playerDataSrc = GameObject.Find ("MPlayerData").GetComponent<MPlayerData>(); // Get the playerData script
 		if(!networkSrc.gameInfo.isOnDedicatedServer){

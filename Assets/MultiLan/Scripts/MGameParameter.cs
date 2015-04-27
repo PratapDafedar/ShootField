@@ -32,8 +32,8 @@ public class MGameParameter : MonoBehaviour {
 	public int mapScreenY = 150;
 	
 	void Awake(){
-		DontDestroyOnLoad(this);	
-		this.name = "MGameParameter";
+		DontDestroyOnLoad(this);
+        this.name = "LevelOption";
 		DefinePlayersNbr();
 	}//Awake	
 	

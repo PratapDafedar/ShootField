@@ -55,7 +55,7 @@ public class MPlayerData : MonoBehaviour {
 	} 
 	
 	public void Start(){
-		parameters = GameObject.Find ("MGameParameter").GetComponent<MGameParameter>(); // Get the menu script
+        parameters = GameObject.Find("LevelOption").GetComponent<MGameParameter>(); // Get the menu script
 		// Instantiate Exclusion list
 		exclusions = new List<MExcusionGame>();
 		

@@ -23,7 +23,8 @@ public class MSpawn : MonoBehaviour {
 		yield return new WaitForSeconds(1);
 		
 		// Instantiate our player
-		Network.Instantiate(playerPrefab, spawn.transform.position, Quaternion.identity, 0);
+		GameObject go = Network.Instantiate(playerPrefab, spawn.transform.position, Quaternion.identity, 0) as GameObject;
+        CameraFollow.Instance.target = go.transform;
 	}
 	
 }

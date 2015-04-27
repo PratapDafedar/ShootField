@@ -101,7 +101,9 @@ public class MLMenu : MonoBehaviour {
 	}//Awake
 	
 	void Start(){
-        defaultPlayerName = GameManager.Instance.cPlayer.name;
+
+        if (GameManager.Instance.cPlayer != null)
+            defaultPlayerName = GameManager.Instance.cPlayer.name;
 
 		DefineFields();	// Define form fields	
 		DefinePlayerData();// Fill player Data

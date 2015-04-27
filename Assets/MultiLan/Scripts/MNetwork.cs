@@ -8,7 +8,7 @@ using MultiPlayer;
 public class MNetwork : MonoBehaviour {
 	// Global parameters
 	public string mainMenuName = "Menu";
-	public string waitRoomName = "WaitRoom";
+	public string waitRoomName = "Room";
 	public string networkMessage = "";
 	
 	// SCRIPTS AND OBJECTS 
@@ -65,7 +65,7 @@ public class MNetwork : MonoBehaviour {
 		DontDestroyOnLoad(this);
 		this.name = "MNetwork";		
 		menuSrc = GameObject.Find (mainMenuName).GetComponent<MMenu>(); // Get the menu script
-		parameters = GameObject.Find ("MGameParameter").GetComponent<MGameParameter>(); // Get the menu script
+        parameters = GameObject.Find("LevelOption").GetComponent<MGameParameter>(); // Get the menu script
 		playerDataSrc = GameObject.Find ("MPlayerData").GetComponent<MPlayerData>(); // Get the playerData script
 		playerList = new List<MUser>(); // Instantiate the playerList
 		positionList = new List<MPlayersPosition>();
@@ -239,8 +239,12 @@ public class MNetwork : MonoBehaviour {
 				chatContent.Clear(); // Clear the chat (because it contains the waitroom Thread and timer)
 			}
 			EnabledPlayer(); // Enabled the render of the other players
-			MSpawn spawnSrc = GameObject.Find("Spawns").GetComponent<MSpawn>();
-			playerPrefab = spawnSrc.playerPrefab;
+            if (GameObject.Find("Spawns") != null)
+            {
+                MSpawn spawnSrc = GameObject.Find("Spawns").GetComponent<MSpawn>();
+                playerPrefab = spawnSrc.playerPrefab;
+            }
+
 			gameInfo.isStarted = true;
 			playerDataSrc.isInGame = true;						
 			
@@ -320,7 +324,7 @@ public class MNetwork : MonoBehaviour {
 			}					
 		} else if(!playerDataSrc.isInGame){ // Else, load the waitroom
 			if(Application.loadedLevelName != waitRoomName && waitRoomName != "" && waitRoomName != null){ // If the map is not already load
-				Application.LoadLevel(waitRoomName);	
+				Application.LoadLevel("Room");	
 			}
 		}
 	}//StartGame	

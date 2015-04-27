@@ -289,10 +289,10 @@ function Update () {
 	var cameraTargetPosition : Vector3 = character.position + initOffsetToPlayer + cameraAdjustmentVector * cameraPreview;
 	
 	// Apply some smoothing to the camera movement
-	mainCameraTransform.position = Vector3.SmoothDamp (mainCameraTransform.position, cameraTargetPosition, cameraVelocity, cameraSmoothing);
+	//mainCameraTransform.position = Vector3.SmoothDamp (mainCameraTransform.position, cameraTargetPosition, cameraVelocity, cameraSmoothing);
 	
 	// Save camera offset so we can use it in the next frame
-	cameraOffset = mainCameraTransform.position - character.position;
+	//cameraOffset = mainCameraTransform.position - character.position;
 }
 
 public static function PlaneRayIntersection (plane : Plane, ray : Ray) : Vector3 {

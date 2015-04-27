@@ -42,8 +42,8 @@ public class MMenu : MonoBehaviour {
 	public bool	displayProfilLan = false;					
 	public bool	displayProfilOnline = false;
 	public bool	displayGameOnline = false;
-	public bool	displayGameLan = false;					
-	public bool	displayMainMenu = true;	
+	public bool	displayGameLan = true;					
+	public bool	displayMainMenu = false;	
 	
 	// Network messages
 	public string[] networkJoinMessage;
@@ -63,30 +63,33 @@ public class MMenu : MonoBehaviour {
 		} catch(NullReferenceException){
 			text = (Instantiate(Resources.Load("MText")) as GameObject).GetComponent<MText>(); 
 		}
-		try{			
-			parameters = GameObject.Find ("MGameParameter").GetComponent<MGameParameter>();	
+		try{
+            parameters = GameObject.Find("LevelOption").GetComponent<MGameParameter>();	
 		} catch(NullReferenceException){
-			parameters = (Instantiate(Resources.Load("MGameParameter")) as GameObject).GetComponent<MGameParameter>();	
+            parameters = (Instantiate(Resources.Load("LevelOption")) as GameObject).GetComponent<MGameParameter>();	
 		}
 	}//Awake
 	
 	void Start(){	
 		networkJoinMessage = new string[2]{null,null};
 		networkCreateMessage = new string[2]{null,null};
-		DefineUsedMenu();	
+		DefineUsedMenu();
+
+        displayMainMenu = false;
+        displayGameLan = true;
 	}//Start
 	
 	void OnGUI(){
 		GUI.skin = text.mmCustomSkin;
 		DefinePositions();
-		if(displayMainMenu){
-			GUI.BeginGroup(mainMenu, "");
-			sizeY=0;
-			DisplayMainMenu();
-			GUI.EndGroup();
-		} else {
-				DisplayBackButton();
-		}
+        //if(displayMainMenu){
+        //    GUI.BeginGroup(mainMenu, "");
+        //    sizeY=0;
+        //    DisplayMainMenu();
+        //    GUI.EndGroup();
+        //} else {
+        //        DisplayBackButton();
+        //}
 		DisplaySubMenu();
 		}//OnGUI
 	
@@ -121,9 +124,9 @@ public class MMenu : MonoBehaviour {
 		}
 		
 		// EXIT
-		if(GUI.Button(new Rect(0,sizeY,text.buttonMenuSizeX,text.buttonMenuSizeY), text.mmMenuExitButton)){
-			Application.Quit();
-		} 			
+        //if(GUI.Button(new Rect(0,sizeY,text.buttonMenuSizeX,text.buttonMenuSizeY), text.mmMenuExitButton)){
+        //    Application.Quit();
+        //} 			
 	}//DisplayMainMenu
 	
 	public void DisplayBackButton(){
