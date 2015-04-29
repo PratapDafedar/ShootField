@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CharacterSynchronizer : MonoBehaviour {
-
+public class CharacterSynchronizer : MonoBehaviour 
+{
+    private PlayerMoveController playerMoveController;
     private NetworkView netView;
 
     float positionX = 0;
@@ -17,7 +18,7 @@ public class CharacterSynchronizer : MonoBehaviour {
         netView = this.gameObject.GetComponent<NetworkView>();
         if (!netView.isMine)
         {
-            //this.GetComponent <Playermo>
+            this.GetComponent<PlayerMoveController>().isControlLocked = true;
         }
 	}
 
