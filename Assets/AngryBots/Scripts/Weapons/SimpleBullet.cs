@@ -4,9 +4,9 @@ using System.Collections;
 
 public class SimpleBullet : MonoBehaviour
 {
-    float speed = 10;
-    float lifeTime = 0.5f;
-    float dist = 10000;
+    public float speed = 10;
+    public float lifeTime = 0.5f;
+    public float dist = 10000;
 
     private float spawnTime = 0.0f;
     private Transform tr;

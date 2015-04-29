@@ -29,27 +29,28 @@ public class Health : MonoBehaviour
 
 
     void Awake(){
-	enabled = false;
-	if (damagePrefab) {
-		if (damageEffectTransform == null)
-			damageEffectTransform = transform;
-		GameObject effect = Spawner.Spawn (damagePrefab, Vector3.zero, Quaternion.identity);
-		effect.transform.parent = damageEffectTransform;
-		effect.transform.localPosition = Vector3.zero;
-		damageEffect = effect.GetComponent<ParticleEmitter>();
-		Vector2 tempSize = new Vector2(GetComponent<Collider>().bounds.extents.x,
-                                        GetComponent<Collider>().bounds.extents.z);
-		colliderRadiusHeuristic = tempSize.magnitude * 0.5f;
-		damageEffectCenterYOffset = GetComponent<Collider>().bounds.extents.y;
+	    enabled = false;
+	    if (damagePrefab) {
+		    if (damageEffectTransform == null)
+			    damageEffectTransform = transform;
+		    GameObject effect = Spawner.Spawn (damagePrefab, Vector3.zero, Quaternion.identity);
+		    effect.transform.parent = damageEffectTransform;
+		    effect.transform.localPosition = Vector3.zero;
+		    damageEffect = effect.GetComponent<ParticleEmitter>();
+		    Vector2 tempSize = new Vector2(GetComponent<Collider>().bounds.extents.x,
+                                            GetComponent<Collider>().bounds.extents.z);
+		    colliderRadiusHeuristic = tempSize.magnitude * 0.5f;
+		    damageEffectCenterYOffset = GetComponent<Collider>().bounds.extents.y;
 
-	}
-	if (scorchMarkPrefab) {
-		scorchMark = GameObject.Instantiate(scorchMarkPrefab, Vector3.zero, Quaternion.identity) as GameObject;
-		scorchMark.SetActive (false);
-	}
-}
+	    }
+	    if (scorchMarkPrefab) {
+		    scorchMark = GameObject.Instantiate(scorchMarkPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+		    scorchMark.SetActive (false);
+	    }
+    }
 
-    void OnDamage(float amount, Vector3 fromDirection){
+    public void OnDamage(float amount, Vector3 fromDirection)
+    {
 	// Take no damage if invincible, dead, or if the damage is zero
 	if(invincible)
 		return;
