@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
             if (_instance == null)
             {
                 GameObject go = new GameObject("GameManager");
+                DontDestroyOnLoad(go);
                 return go.AddComponent<GameManager>();
             }
             return _instance;
@@ -27,13 +28,14 @@ public class GameManager : MonoBehaviour {
 
     public List<User> onlinePlayers;
 
-
     void Awake()
     {
         if (_instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(this);
+            if (cPlayer == null)
+                cPlayer = new User();
         }
         else
         {
@@ -41,17 +43,17 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public void LoadLobbyScreen()
+    public static void LoadLobbyScreen()
     {
         Application.LoadLevel("Lobby");
     }
     
-    public void LoadGameArena ()
+    public static void LoadGameArena ()
     {
         Application.LoadLevel("GameArena");
     }
 
-    public void LoadLogin ()
+    public static void LoadLogin ()
     {
         Application.LoadLevel("Login");
     }

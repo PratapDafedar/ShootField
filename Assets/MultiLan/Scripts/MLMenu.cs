@@ -175,12 +175,16 @@ public class MLMenu : MonoBehaviour {
 		sizeY = m.text.space;	
 		subMenuMultiButton = GUI.SelectionGrid(new Rect(m.text.margin,sizeY,m.text.buttonSubMenuSizeX*subMenuMultiButtons.Length,m.text.buttonSubMenuSizeY), subMenuMultiButton, subMenuMultiButtons, subMenuMultiButtons.Length);
 			sizeY+= m.text.space;
-		if(ViewGameList()){
+		if(ViewGameList())
+        {
 			EmtpyCreateForm();
 			EmtpyJoinIpForm();
 			sizeY+= m.text.margin;	
 			DisplayGameList();
-		} else if(ViewJoinIp()){
+
+            //GetNetworkGames(false);
+		} 
+        else if(ViewJoinIp()){
 			viewErrorMessage =null;
 			EmtpyCreateForm();
 			sizeY+= m.text.space;
@@ -451,12 +455,13 @@ public class MLMenu : MonoBehaviour {
 		sizeY+= m.text.space;			
 		
 		GUI.Label(new Rect(m.text.internalMargin,sizeY, m.text.labelSizeX,m.text.labelSizeY), m.text.mlmCreatePrivateIpTxt);
-		GUI.Label(new Rect(m.text.formMargin,sizeY, m.text.labelSizeX,m.text.labelSizeY),  m.playerDataSrc.privateIP);
-		sizeY+= m.text.space;		
-				
-		if(m.playerDataSrc.publicIP != "" && m.playerDataSrc.publicIP != null) {
+        GUI.Label(new Rect(m.text.formMargin, sizeY, m.text.labelSizeX, m.text.labelSizeY), GameManager.Instance.cPlayer.privateIp);
+		sizeY+= m.text.space;
+
+        if (GameManager.Instance.cPlayer.publicIp != "" && GameManager.Instance.cPlayer.publicIp != null)
+        {
 			GUI.Label(new Rect(m.text.internalMargin,sizeY, m.text.labelSizeX,m.text.labelSizeY),  m.text.mlmCreatePublicIpTxt);
-			GUI.Label(new Rect(m.text.formMargin,sizeY, m.text.labelSizeX,m.text.labelSizeY),  m.playerDataSrc.publicIP);
+            GUI.Label(new Rect(m.text.formMargin, sizeY, m.text.labelSizeX, m.text.labelSizeY), GameManager.Instance.cPlayer.publicIp);
 			sizeY+= m.text.space;
 		}
 		
@@ -503,16 +508,19 @@ public class MLMenu : MonoBehaviour {
 	}//DisplayCreateGame
 	
 	private void StartNetwork(string name, int playerNbr, int port,  bool isPrivate){
-		InstantiateNetwork();
+		//InstantiateNetwork();
+        NetworkManager.LoadNetworkManager ();
 		m.networkSrc.StartServer(0, name, playerNbr, port, false, null, null, null, isPrivate, false, true, false);
 		
 	}//StartNetwork	
 	
 	private void JoinNetwork(string ip, int port){
-		InstantiateNetwork();	
+		//InstantiateNetwork();	
+        NetworkManager.LoadNetworkManager ();
 		m.networkSrc.JoinServer(ip, port, false, null, true, false);
 	}//JoinNetwork
 	
+#if false
 	// Instantiate MNetwork gameobject and define some parameters
 	private void InstantiateNetwork(){
 		if(m.networkObj != null) { // If we have already a network gameObject
@@ -524,7 +532,8 @@ public class MLMenu : MonoBehaviour {
 		m.playerDataSrc.isOnline = false;	
 		m.playerDataSrc.nameInGame = m.playerDataSrc.playerName;
 	}//InstantiateNetwork
-	
+#endif
+
 	private bool ViewGameList(){
 		if((subMenuMultiButton == 0 && subMenuMultiButtons[0].Equals(m.text.mlmMultiButtonsOptions[0]))
 			|| (subMenuMultiButton == 1 && subMenuMultiButtons[1].Equals(m.text.mlmMultiButtonsOptions[0]))){	
@@ -552,11 +561,9 @@ public class MLMenu : MonoBehaviour {
 	
 	/******************** SAVE FUNCTIONS *****************/
 	//Check the forms before send it anywhere (call from the different Display functions)	
-	private void SaveProfile(string name){
-		m.playerDataSrc.playerName = name;
-		if(!m.useOnline){
-			m.playerDataSrc.nameInGame = name;
-		}
+	private void SaveProfile(string name)
+    {
+        GameManager.Instance.cPlayer.name = name;
 		PlayerPrefs.SetString("playerProfil", name);		
 	}//SaveProfile
 	
@@ -698,13 +705,8 @@ public class MLMenu : MonoBehaviour {
 						// ------ Check that I have not been exculded of this game -------
 						bool isExcluded = false;
 						string hostIp = m.networkSrc.gameInfo.hostPublicIp;
-						if(m.networkSrc.gameInfo.hostPublicIp == m.playerDataSrc.publicIP){
+						if(m.networkSrc.gameInfo.hostPublicIp == GameManager.Instance.cPlayer.publicIp){
 							hostIp = m.networkSrc.gameInfo.hostPrivateIp;
-						}
-						for(int i=0; i < m.playerDataSrc.exclusions.Count; i++){
-							if(hostIp == m.playerDataSrc.exclusions[i].hostPrivateIp && int.Parse(formViewPort) == m.playerDataSrc.exclusions[i].port){
-								isExcluded=true;
-							}
 						}
 						//-----------------------------------------------------------------						
 						// If I have not been excluded of this game :
@@ -735,9 +737,7 @@ public class MLMenu : MonoBehaviour {
 		try{
 			int serverPort = int.Parse(formViewPort);			
 			// Instantiate the network prefab which will make us connect on the IP
-			m.networkObj =  Instantiate(Resources.Load("MNetworkManager")) as GameObject; 
-			m.networkSrc = m.networkObj.GetComponent<MNetwork>();	
-			m.networkSrc.SearchGame(serverPort, serverIp);		
+			NetworkManager.Instance.SearchGame(serverPort, serverIp);		
 		} catch(FormatException){
 			viewErrorMessage = m.text.mlmErrorPort;
 			return;
@@ -784,18 +784,17 @@ public class MLMenu : MonoBehaviour {
 		}	
 	}//DefineFields
 	
-	private void DefinePlayerData(){	
+	private void DefinePlayerData()
+    {	
 		// Fill m.playerDataSrc with the player's data
-		if(m.playerDataSrc.playerName == "" || m.playerDataSrc.playerName == null){
-			m.playerDataSrc.playerName = formProfilName;
+        if (GameManager.Instance.cPlayer.name == "" || GameManager.Instance.cPlayer.name == null)
+        {
+            GameManager.Instance.cPlayer.name = formProfilName;
 		} else {
-			formProfilName = m.playerDataSrc.playerName;
+            formProfilName = GameManager.Instance.cPlayer.name;
 		}
-		if(!m.useOnline){
-			m.playerDataSrc.nameInGame = m.playerDataSrc.playerName;
-		}
-		m.playerDataSrc.isInGame = false;
-		m.playerDataSrc.privateIP = Network.player.ipAddress;				
+        GameManager.Instance.cPlayer.isPlayerInGame = false;
+        GameManager.Instance.cPlayer.privateIp = Network.player.ipAddress;				
 	}//DefinePlayerData
 	
 	private void FilterGames(bool[] maps, string ping, bool notStarted, bool started, bool[] playerNbr, bool fullGameYes){				
@@ -875,8 +874,8 @@ public class MLMenu : MonoBehaviour {
 			WWW www = new WWW(ipOnline);
         	yield return www;
 			if(www.isDone){			
-				if(www.text != "") {					
-					m.playerDataSrc.publicIP = www.text;
+				if(www.text != "") {
+                    GameManager.Instance.cPlayer.publicIp = www.text;
 				}
 			}
 		} else {
@@ -894,7 +893,7 @@ public class MLMenu : MonoBehaviour {
 						searchIP = new Regex("[0-9]+.[0-9]+.[0-9]+.[0-9]+");    
 						Match match2 = searchIP.Match(match.Value);					
 						if(match2.Success){
-							m.playerDataSrc.publicIP = match2.Value;
+                            GameManager.Instance.cPlayer.publicIp = match2.Value;
 						}
 					}	
 				}			

@@ -7,7 +7,7 @@ public class MGameMenu : MonoBehaviour {
 	public bool useChat = true;
 	public bool usePlayerList = true;
 	
-	public MNetwork networkSrc;
+	public NetworkManager networkSrc;
 	public MText text;
 	public bool viewChat;
 	public bool viewPlayerList;
@@ -31,7 +31,7 @@ public class MGameMenu : MonoBehaviour {
 	}//Awake
 	
 	void Start(){
-		networkSrc = GameObject.Find ("MNetwork").GetComponent<MNetwork>();
+		networkSrc = NetworkManager.Instance;
 		text = GameObject.Find ("MText").GetComponent<MText>();
 	}//Start
 	
@@ -50,7 +50,7 @@ public class MGameMenu : MonoBehaviour {
 		DisplayGamePannel();	
 		// Display game menus
 		buttonPosRect = new Rect(5,Screen.height-25,60,20);
-		if(!networkSrc.isGameServerRebuild && !networkSrc.isGameServerRebuildFailed && !networkSrc.isPlayerExitGame && networkSrc.gameInfo.isStarted && networkSrc.playerDataSrc.isInGame) {
+		if(!networkSrc.isGameServerRebuild && !networkSrc.isGameServerRebuildFailed && !networkSrc.isPlayerExitGame && networkSrc.gameInfo.isStarted && GameManager.Instance.cPlayer.isPlayerInGame) {
 			buttonPos = buttonPosRect;
 			if(useExit){				
 				if(GUI.Button(buttonPos, text.gmMenuExit)){
@@ -87,6 +87,9 @@ public class MGameMenu : MonoBehaviour {
 		menu = new Rect(menuPosX, menuPosY, menuSizeX, menuSizeY);
 
 		GUI.BeginGroup(menu);	
+#if false
+        //Removed friend functionality here. Refer MNetwork.
+
 		//  IF THE HOST TRY TO EXCULDE A PLAYER
 		if (networkSrc.isExculdePlayer && networkSrc.isGameHost){	
 			DisplayExcludePlayer();
@@ -110,9 +113,10 @@ public class MGameMenu : MonoBehaviour {
 		// IF AD ANSWER TO FRIENDLIST ADDING
 		} else if(networkSrc.isFriendAskYes || networkSrc.isFriendAskNo){	
 			DisplayFriendAnswer();	
-		
 		// ELSE, IF THE SERVER REBUILD FAILED :
-		} else if(networkSrc.isGameServerRebuildFailed){
+		} else 
+#endif
+        if(networkSrc.isGameServerRebuildFailed){
 			DisplayRebuildFailed();
 		
 		 // ELSE, IF THE DEDICATED SERVER IS BREALDOWN :
@@ -161,7 +165,7 @@ public class MGameMenu : MonoBehaviour {
 		} else {				
 			GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), text.gmRebuildSeachNewHostTxt);
 			sizeY+= 30;
-			GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), text.gmRebuildTimerTxt+networkSrc.rebuildServerTimer.ToString()+text.gmRebuildTimerSecTxt);
+			GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), text.gmRebuildTimerTxt+"Server never gonna rebuild. LOL :P"+text.gmRebuildTimerSecTxt);
 		}
 	}//DisplayRebuild
 	
@@ -172,14 +176,14 @@ public class MGameMenu : MonoBehaviour {
 		GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), text.nmRebuildSearchTxt);				
 		sizeY+= 100;
 		// If we want to try the rebuild one more time :
-		if(GUI.Button(new Rect(20,sizeY, buttonSizeX, buttonSizeY), text.gmRebuildFailedTryButton)) {
+		if(GUI.Button(new Rect(20,sizeY, buttonSizeX, buttonSizeY), "Exit")) {
 			// Call StartRebuildServer to restart the rebuild
-			networkSrc.StartRebuildServer();	
+            GameManager.LoadLobbyScreen();
 		}
-		if(GUI.Button(new Rect(buttonSizeX+50,sizeY, buttonSizeX, buttonSizeY), text.gmRebuildFailedExitButton)) {
-			// Exit the game
-			networkSrc.ExitGame(true);		
-		}
+        //if(GUI.Button(new Rect(buttonSizeX+50,sizeY, buttonSizeX, buttonSizeY), text.gmRebuildFailedExitButton)) {
+        //    // Exit the game
+        //    networkSrc.ExitGame(true);		
+        //}
 	}//DisplayRebuildFailed
 	
 	public void DisplayBreakDownServer(){
@@ -194,98 +198,4 @@ public class MGameMenu : MonoBehaviour {
 		}
 	}//DisplayBreakDownServer
 	
-	public void DisplayExcludePlayer(){	
-		int sizeY=this.sizeY;
-		GUI.Box(new Rect(0,0,menuSizeX, menuSizeY), text.gmExcludeTitle);
-		sizeY+= 10;
-		GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), text.gmExcludeText);
-		sizeY+= 20;
-		GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), networkSrc.excludedPlayer.playerName);
-		sizeY+= 40;
-		if(networkSrc.gameInfo.isOnline && networkSrc.playerDataSrc.useBlacklist){
-			networkSrc.alwaysExcudePlayer=GUI.Toggle(new Rect(20,sizeY,menuSizeX,50), networkSrc.alwaysExcudePlayer, text.gmExcludeBlacklist);
-		}
-		sizeY+= 50;
-		// If we click on "YES" :
-		if(GUI.Button(new Rect(20, sizeY, buttonSizeX, buttonSizeY), text.gmYes)){
-			networkSrc.ConfirmExcludePlayer();
-		}
-		// If we click on "NO" :
-		if(GUI.Button(new Rect(buttonSizeX+40, sizeY, buttonSizeX, buttonSizeY), text.gmNo)){
-			networkSrc.CancelExcludePlayer();
-		}
-	}//DisplayExcludePlayer
-	
-	public void DisplayExculdedPlayer(){	
-		int sizeY=this.sizeY;
-		GUI.Box(new Rect(0,0,menuSizeX, menuSizeY), text.gmExcludePlayerTitle );
-		sizeY+= 10;
-		GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), text.gmExcludePlayerText );
-		sizeY+= 100;
-			
-		// If the game is online 
-		if(networkSrc.gameInfo.isOnline){
-			// Exit the game on the dataBase
-			networkSrc.playerDataSrc.ExitGame();
-		}			
-		// If we click on "OK" :
-		if(GUI.Button(new Rect(20, sizeY, buttonSizeX, buttonSizeY), text.gmExcludePlayerButton)){
-			// Exit the game
-			networkSrc.ExitGame(false);			
-		}		
-	}//DisplayExculdedPlayer
-	
-	public void DisplayFriendPlayer(){	
-		int sizeY=this.sizeY;
-		GUI.Box(new Rect(0,0,menuSizeX, menuSizeY), text.gmFriendTitle);
-		sizeY+= 10;
-		GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), text.gmFriendText);
-		sizeY+= 20;
-		GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), networkSrc.friendPlayer.playerName);
-		sizeY+= 50;
-		// If we click on "YES" :
-		if(GUI.Button(new Rect(20, sizeY, buttonSizeX, buttonSizeY), text.gmYes)){
-			networkSrc.SendFriendAsk();
-		}
-		// If we click on "NO" :
-		if(GUI.Button(new Rect(buttonSizeX+40, sizeY, buttonSizeX, buttonSizeY), text.gmNo)){
-			networkSrc.isFriendPlayer = false;
-		}
-	}//DisplayFriendPlayer
-	
-	public void DisplayFriendAsk(){
-		int sizeY=this.sizeY;
-		GUI.Box(new Rect(0,0,menuSizeX, menuSizeY), text.gmFriendAskTitle);
-		sizeY+= 10;
-		GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), networkSrc.friendAskPlayer.playerName+text.gmFriendAskText);
-		sizeY+= 20;
-		GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), text.gmFriendAskQuestion);	
-		sizeY+= 50;
-		// If we click on "YES" :
-		if(GUI.Button(new Rect(20, sizeY, buttonSizeX, buttonSizeY), text.gmYes)){
-			networkSrc.FriendAskAnswer(true);
-		}
-		// If we click on "NO" :
-		if(GUI.Button(new Rect(buttonSizeX+40, sizeY, buttonSizeX, buttonSizeY), text.gmNo)){
-			networkSrc.FriendAskAnswer(false);
-		}
-	}//DisplayFriendAsk
-	
-	public void DisplayFriendAnswer(){
-		int sizeY=this.sizeY;
-		GUI.Box(new Rect(0,0,menuSizeX, menuSizeY), text.gmFriendAnswerTitle);
-		sizeY+= 10;
-		if(networkSrc.isFriendAskYes){
-			GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), networkSrc.friendPlayer.playerName+text.gmFriendAnswerTextYes);	
-		}else{
-			GUI.Label(new Rect(20,sizeY, menuSizeX,menuSizeY), networkSrc.friendPlayer.playerName+text.gmFriendAnswerTextNo);	
-		}
-		sizeY+= 50;
-		// If we click on "YES" :
-		if(GUI.Button(new Rect(20, sizeY, buttonSizeX, buttonSizeY), text.gmOk)){
-			networkSrc.friendPlayer=null;
-			networkSrc.isFriendAskYes = false;
-			networkSrc.isFriendAskNo = false;
-		}
-	}//DisplayFriendAnswer	
 }//MGameMenu

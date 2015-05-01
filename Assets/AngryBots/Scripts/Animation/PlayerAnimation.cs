@@ -99,7 +99,7 @@ public class PlayerAnimation : MonoBehaviour
 
     void  OnStopFire (){
 	    animationComponent[shootAdditive.name].enabled = false;
-    }
+    }   
 
     void  FixedUpdate (){
 	    velocity = (tr.position - lastPosition) / Time.deltaTime;

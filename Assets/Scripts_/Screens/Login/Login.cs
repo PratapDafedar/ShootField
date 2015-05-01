@@ -20,6 +20,6 @@ public class Login : MonoBehaviour {
         
         GameManager.Instance.cPlayer = player;
 
-        GameManager.Instance.LoadLobbyScreen();
+        GameManager.LoadLobbyScreen();
     }
 }

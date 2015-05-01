@@ -150,19 +150,22 @@ namespace MultiPlayer {
 		public static List<MUser> PingSort(List<MUser> userList){
 			return userList.OrderBy(x=>x.playerPing).ToList();	
 		}//PingSort
-		
-		public static void PingPlayers(MNetwork networkSrc){
+
+        public static void PingPlayers(NetworkManager networkSrc)
+        {
 			networkSrc.PingPlayers();
 		}//PingPlayers
-		
-		public static string GetHostMessage(int key, MNetwork networkSrc){
+
+        public static string GetHostMessage(int key, NetworkManager networkSrc)
+        {
 			if(networkSrc.playerList[key].gameId == networkSrc.gameInfo.hostId){
 				return "[host]";
 			}
 			return "";
 		}//GetHostMessage
-		
-		public static string GetPlayerPing(int key, MNetwork networkSrc){
+
+        public static string GetPlayerPing(int key, NetworkManager networkSrc)
+        {
 			return networkSrc.playerList[key].playerPing.ToString();			
 		}//GetPlayerPing
 	}//MUser

@@ -22,7 +22,7 @@ public class MGameChat : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		menuSrc = GameObject.Find ("MGameMenu").GetComponent<MGameMenu>();
-		chatScroll = new Vector2(0, (20*(menuSrc.networkSrc.chatContent.Count+1)) - chatBoxSizeY);		
+        chatScroll = new Vector2(0, (20 * (NetworkManager.Instance.chatContent.Count + 1)) - chatBoxSizeY);		
 	}
 	
 	void OnGUI(){	
@@ -52,7 +52,7 @@ public class MGameChat : MonoBehaviour {
 				textChat=GUI.TextField(new Rect(margin, chatPanelSizeY-margin-chatFieldSieY, chatFieldSizeX, chatFieldSieY), textChat);
 				if(GUI.Button(new Rect(chatFieldSizeX+margin*2, chatPanelSizeY-margin-chatFieldSieY, chatButtonSizeX, chatButtonsSizeY), menuSrc.text.gmChatButtonTxt) || Input.GetKeyDown(KeyCode.KeypadEnter)){
 					if(textChat != "") {
-						string message = menuSrc.networkSrc.playerDataSrc.nameInGame+" : "+textChat;
+						string message = GameManager.Instance.cPlayer.name +" : "+textChat;
 						int maxChar = (int)Math.Round((chatBoxSizeX-20) / 6.8f);
 						if(message.Length > maxChar){
 							message = message.Substring(0, maxChar);

@@ -2,11 +2,10 @@ using UnityEngine;
 using System;
 using MultiPlayer;
 
-public class MMenu : MonoBehaviour {		
-	public GameObject dataObj;
-	public GameObject networkObj;	
-	public MPlayerData playerDataSrc;	
-	public MNetwork networkSrc;	
+public class MMenu : MonoBehaviour 
+{
+	public GameObject networkObj;
+    public NetworkManager networkSrc;	
 	public MText text;	
 	public MGameParameter parameters;	
 	
@@ -49,28 +48,28 @@ public class MMenu : MonoBehaviour {
 	public string[] networkJoinMessage;
 	public string[] networkCreateMessage;
 	
-	void Awake(){
+	void Awake()
+    {
 		// Instantiate useful objects if they are not yet instantiated	
-		try{			
-			dataObj = GameObject.Find ("MPlayerData");
-			playerDataSrc = dataObj.GetComponent<MPlayerData>();
-		} catch(NullReferenceException){
-			dataObj = Instantiate(Resources.Load("MPlayerData")) as GameObject;
-			playerDataSrc = dataObj.GetComponent<MPlayerData>();
-		}		
-		try{			
+        networkSrc = NetworkManager.Instance;
+
+		try
+        {
 			text = GameObject.Find ("MText").GetComponent<MText>(); 
 		} catch(NullReferenceException){
 			text = (Instantiate(Resources.Load("MText")) as GameObject).GetComponent<MText>(); 
 		}
-		try{
+
+		try
+        {
             parameters = GameObject.Find("LevelOption").GetComponent<MGameParameter>();	
 		} catch(NullReferenceException){
             parameters = (Instantiate(Resources.Load("LevelOption")) as GameObject).GetComponent<MGameParameter>();	
 		}
 	}//Awake
 	
-	void Start(){	
+	void Start()
+    {	
 		networkJoinMessage = new string[2]{null,null};
 		networkCreateMessage = new string[2]{null,null};
 		DefineUsedMenu();
@@ -198,9 +197,9 @@ public class MMenu : MonoBehaviour {
 	
 	public void LanGetNetworkGames(bool arg){
 		// USE IT ONLY IF YOU HAVE MULTILAN
-		/*if(useLan && menuLan != null){
+		if(useLan && menuLan != null){
 			menuLan.GetNetworkGames(arg);
-		}*/
+		}
 	} //LanGetNetworkGames
 	
 }//MMenu

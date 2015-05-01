@@ -50,7 +50,7 @@ public class MGamePlayerList : MonoBehaviour {
 				
 				for(int i = 0; i < menuSrc.networkSrc.playerList.Count; i++){									
 					GUI.Box(new Rect(10,sizeY,180, 30), "");	
-					GUI.Label(new Rect(15,sizeY+6,170, 20), menuSrc.networkSrc.playerList[i].playerName+" "+MUser.GetHostMessage(i, menuSrc.networkSrc)+" : "+MUser.GetPlayerPing(i, menuSrc.networkSrc)+" ms");
+					GUI.Label(new Rect(15,sizeY+6,170, 20), menuSrc.networkSrc.playerList[i].name+" "+MUser.GetHostMessage(i, menuSrc.networkSrc)+" : "+MUser.GetPlayerPing(i, menuSrc.networkSrc)+" ms");
 					
 					// USE IF ONLY IF YOU HAVE MULTIONLINE : 
 					/*if(menuSrc.networkSrc.playerDataSrc.useFriendlist){
@@ -64,8 +64,7 @@ public class MGamePlayerList : MonoBehaviour {
 								GUI.Label(new Rect(165,sizeY+6,20, 20), "  +");
 							}
 						}
-					}*/
-					//---
+					}
 					if(menuSrc.networkSrc.isGameHost && menuSrc.networkSrc.playerList[i].gameId != menuSrc.networkSrc.playerDataSrc.gameId){
 						int sizeZ = 165;
 						if(menuSrc.networkSrc.playerDataSrc.isOnline && menuSrc.networkSrc.playerDataSrc.useFriendlist){
@@ -75,6 +74,8 @@ public class MGamePlayerList : MonoBehaviour {
 							menuSrc.networkSrc.ExcludePlayer(menuSrc.networkSrc.playerList[i]);				
 						}
 					}
+                     */
+					//---
 					sizeY+=35;
 				}								
 				GUI.EndScrollView();

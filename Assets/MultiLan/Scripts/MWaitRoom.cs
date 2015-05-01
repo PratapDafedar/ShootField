@@ -7,10 +7,8 @@ using MultiPlayer;
 public class MWaitRoom : MonoBehaviour {
 	//------ ATTACHED SCRIPTS
 	public MGameParameter parameters;	
-	public MText text;	
-	public MPlayerData playerDataSrc;	
-	public MNetwork networkSrc;	
-
+	public MText text;
+    public NetworkManager networkSrc;	
 	
 	//------ TIMER PARAMETRES 
 	public bool useLoadTimer = true;
@@ -68,8 +66,7 @@ public class MWaitRoom : MonoBehaviour {
 		Instantiate(Resources.Load("MGameMenu"));
 		text = GameObject.Find ("MText").GetComponent<MText>(); // Get the menu script
         parameters = GameObject.Find("LevelOption").GetComponent<MGameParameter>(); // Get the menu script
-		networkSrc = GameObject.Find ("MNetwork").GetComponent<MNetwork>(); // Get the menu script
-		playerDataSrc = GameObject.Find ("MPlayerData").GetComponent<MPlayerData>(); // Get the playerData script
+		networkSrc = NetworkManager.Instance; // Get the menu script
 		if(!networkSrc.gameInfo.isOnDedicatedServer){
 			GetComponent<NetworkView>().RPC("AskStatus", RPCMode.Server, Network.player);	
 		}
@@ -104,27 +101,29 @@ public class MWaitRoom : MonoBehaviour {
 		// Display the player list
 		for(int i = 0; i < networkSrc.playerList.Count; i++){
 			string serverMessage="";
-			if(networkSrc.playerList[i].isGameHost == 1) {
+			if(networkSrc.playerList[i].isGameHost == true) {
 				serverMessage = text.wrPlayerListHostTxt;
 			} else {
 				serverMessage = text.wrPlayerListClientTxt;
 			}
 			string playerStatus ="";
-			if(networkSrc.playerList[i].isPlayerInGame == 1){
+            if (networkSrc.playerList[i].isPlayerInGame == true)
+            {
 				playerStatus =text.wrPlayerListStatutGameTxt;
 			} else {
 				playerStatus =text.wrPlayerListStatWaitTxt;
 			}			
 			string pingText=""; 				
 			// If the current ID is the host's ID : I ping the host (and if I have not been excuded of the game)
-			if(networkSrc.playerList[i].isGameHost == 1 && !networkSrc.isGameHost && !networkSrc.isPlayerExculde) {
+            if (networkSrc.playerList[i].isGameHost == true && !networkSrc.isGameHost && !networkSrc.isPlayerExculde)
+            {
 				pingText = Network.GetAveragePing(Network.connections[networkSrc.gameInfo.hostId]).ToString();
 			// ELse (if it's a simple player) : display the ping wich have been done by the host
 			} else {
 				pingText = networkSrc.playerList[i].playerPing.ToString();
 			}						
 			GUI.Box(new Rect(text.margin,sizeY,playerListSizeX-text.margin*3, playerListBoxSizeY), "");
-			GUI.Label(new Rect(text.margin*2,sizeY+text.margin/2,playerListSizeX, playerListBoxSizeY),networkSrc.playerList[i].playerName+" "+serverMessage+": "+ playerStatus+" "+pingText+" ms ");
+			GUI.Label(new Rect(text.margin*2,sizeY+text.margin/2,playerListSizeX, playerListBoxSizeY),networkSrc.playerList[i].name+" "+serverMessage+": "+ playerStatus+" "+pingText+" ms ");
 			float buttonSizeX = playerListSizeX-buttonExculdeSizeX-text.margin*2.5f;
 			
 			// USE IF ONLY IF YOU HAVE MULTIONLINE :
@@ -142,12 +141,13 @@ public class MWaitRoom : MonoBehaviour {
 				buttonSizeX-= (buttonExculdeSizeX+text.margin/2);
 			} */
 			//---
+#if false
 			if(networkSrc.isGameHost && networkSrc.playerList[i].gameId != networkSrc.playerDataSrc.gameId){
 				if(GUI.Button(new Rect(buttonSizeX, sizeY+text.margin/2, buttonExculdeSizeX,buttonExculdeSizeY), "X")){
 					networkSrc.ExcludePlayer(networkSrc.playerList[i]);
 				}
 			}
-			
+#endif
 			sizeY+=playerListBoxSizeY+text.margin/2;		
 		}		
 		GUI.EndScrollView();		
@@ -206,7 +206,7 @@ public class MWaitRoom : MonoBehaviour {
 			chatSizeY-text.margin-chatButtonSizeY, chatButtonSizeX, chatButtonSizeY),
 			text.wrChatButtonTxt)){
 			if(formChatTxt != "") {
-				string message = playerDataSrc.nameInGame+" : "+formChatTxt;				
+				string message = GameManager.Instance.cPlayer.name + " : " + formChatTxt;				
 				int maxChar = (int)Math.Round((chatSizeX) / 6.9f);
 				if(message.Length > maxChar){
 					message = message.Substring(0, maxChar);
@@ -317,10 +317,7 @@ public class MWaitRoom : MonoBehaviour {
 	[RPC]
 	void ChangeMap(int newMapKey){
 		networkSrc.gameInfo.mapKey = newMapKey;
-		networkSrc.gameInfo.mapName = parameters.maps[newMapKey];
-		if(networkSrc.gameInfo.isOnline){			
-			networkSrc.playerDataSrc.RefreshGameMap(networkSrc.gameInfo.id, parameters.maps[newMapKey]);	
-		}
+		networkSrc.gameInfo.mapName = parameters.maps[newMapKey];		
 	}//ChangeMap
 	
 	// Load the game : call from server to the clients when he click on "Start game"

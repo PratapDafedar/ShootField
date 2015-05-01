@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 
-public class MSpawn : MonoBehaviour {
+public class MSpawn : MonoBehaviour 
+{
 	public GameObject playerPrefab;
 	private Transform [] spawners;
 	
@@ -27,4 +28,8 @@ public class MSpawn : MonoBehaviour {
         CameraFollow.Instance.target = go.transform;
 	}
 	
+    void OnNetworkInstantiate(NetworkMessageInfo info) 
+    {
+        Debug.Log("New object instantiated by " + info.sender);
+    }
 }
