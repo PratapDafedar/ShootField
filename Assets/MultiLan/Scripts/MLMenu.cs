@@ -97,7 +97,16 @@ public class MLMenu : MonoBehaviour {
 	private float sizeY;
 	
 	void Awake(){
-		m = this.GetComponent<MMenu>();		
+		m = this.GetComponent<MMenu>();
+
+        try
+        {
+            uLink.MasterServer.RequestHostList("ShootField");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
 	}//Awake
 	
 	void Start(){
@@ -107,7 +116,7 @@ public class MLMenu : MonoBehaviour {
 
 		DefineFields();	// Define form fields	
 		DefinePlayerData();// Fill player Data
-		StartCoroutine(GetPublicAddress());	// Search the public IP 		
+		//StartCoroutine(GetPublicAddress());	// Search the public IP 		
 		if(useNetworkGames){	
 			try {
 				networkIPList = MLIpList.GetComputers();		
@@ -287,7 +296,7 @@ public class MLMenu : MonoBehaviour {
 					
 					if(viewList[i].totalPlayer < viewList[i].maxPlayer){
 						if(GUI.Button(new Rect(buttonX, sizeY+(m.text.listPanelSizeY/1.5f/10), m.text.gameListJoinButtonX, m.text.buttonSizeY), m.text.mmViewJoinButton)){
-							JoinNetwork(viewList[i].hostPrivateIp, viewList[i].port);			
+							JoinNetwork(viewList[i].hostPublicIp, viewList[i].port);			
 						}
 					}
 					sizeY+= m.text.listPanelSizeY;	
@@ -568,10 +577,10 @@ public class MLMenu : MonoBehaviour {
 	}//SaveProfile
 	
 	private void EmtpyCreateForm(){
-		formCreateName="";
+		//formCreateName="";
 		formCreatePlayers[0] = m.parameters.minPlayers;
 		formCreatePlayers[1] = 0;
-		formCreatePort = m.parameters.defaultPort.ToString();
+        formCreatePort = m.parameters.defaultPort.ToString();
 		createMessage=null;
 		viewCreateMessage = false;
 	}//EmtpyCreateForm
@@ -667,7 +676,76 @@ public class MLMenu : MonoBehaviour {
 	
 	/******************** PUBLIC FUNCTIONS **************************/
 	// Browse the differents IP of the network to see if they have an open game
-	public void GetNetworkGames(bool refresh){
+    private void RefreshHostList()
+    {
+        GetNetworkGames(true);
+    }
+
+	public void GetNetworkGames(bool refresh = false)
+    {
+        CancelInvoke("RefreshHostList");
+        Invoke("RefreshHostList", 1.0f);
+
+        int serverPort = 7101;
+        try
+        {
+             serverPort = int.Parse(formViewPort);
+        }
+        catch (FormatException)
+        {
+            viewErrorMessage = m.text.mlmErrorPort;
+            return;
+        }
+        if (refresh)
+        { 
+            gameList.Clear();
+        }
+        List <uLink.HostData> hosts = new List<uLink.HostData> (uLink.MasterServer.PollAndDiscoverLocalHosts("ShootField", serverPort, 1));
+        
+        uLink.HostData[] hosts_ = uLink.MasterServer.PollAndRequestHostList ("ShootField", 2); 
+
+        if (hosts != null && hosts_ != null && hosts_.Length > 0)
+        {
+            hosts.AddRange(hosts_);
+        }
+
+        if (hosts != null && hosts.Count > 0)
+        {            
+            foreach (uLink.HostData host in hosts)
+            {
+                // If we have obtained the game informations
+                if (host.IsDefined())
+                {
+                    // ------ Check that I have not been exculded of this game -------
+                    string hostIp = host.ipAddress.ToString ();
+                    if (hostIp == GameManager.Instance.cPlayer.publicIp)
+                    {
+                        hostIp = m.networkSrc.gameInfo.hostPrivateIp;
+                    }
+                    //-----------------------------------------------------------------						
+                    // If I have not been excluded of this game :
+                    //if (!host.dedicatedServer)
+                    {
+                        MGame mGame = new MGame(host.gameName,
+                                                host.port,
+                                                host.connectedPlayers,
+                                                host.playerLimit,
+                                                false,
+                                                false,
+                                                host.gameName,
+                                                host.guid,
+                                                host.gameLevel,
+                                                host.internalIP,
+                                                host.externalIP,
+                                                host.ping);
+                        gameList.Add(mGame);
+                    }
+                }
+            }
+        }
+
+        return;
+#if false
 		if(networkIPList == null){ // If the network ip list is null : stop the function
 			return;
 		}else {	// Else : 
@@ -724,7 +802,8 @@ public class MLMenu : MonoBehaviour {
 				SearchGameOnIp(currentIp); // Search game on this IP
 				searchNextIpKey++; // Increment the IP key
 			}
-		}				
+		}	
+#endif	
 	}//GetNetworkGames 
 	
 	// Instantiate the server by the networkPrefab object to search a party

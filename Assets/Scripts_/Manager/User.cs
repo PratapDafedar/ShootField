@@ -3,17 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+[System.Serializable]
 public class User 
 {
-    public int   id;
+    public int      id;
     public string   name;
 
-	public int      gameId;
+	public string   gameId;
 	public string   privateIp;
 	public string   publicIp;		
 	public int      playerPing;
 	public bool     isPlayerInGame;
 	public bool     isGameHost;
+
+    //game-play properties.
+    public float    health;
+    public int      score;
 
     public enum Team
     {
@@ -29,9 +34,10 @@ public class User
     }
 
 	// Constructor with variable in string 
-	public User(string id, string gameId, string privateIp, string publicIp, string playerName, string playerPing, string isPlayerInGame, string isGameHost){
+	public User(string id, string gameId, Team team, int score, string privateIp, string publicIp, string playerName, string playerPing, string isPlayerInGame, string isGameHost){
 		this.id = int.Parse(id);
-		this.gameId = int.Parse(gameId);
+		this.gameId = gameId;
+        this.cTeam = team;
 		this.privateIp = privateIp;
 		this.publicIp = publicIp;
         this.name = playerName;	
@@ -41,9 +47,10 @@ public class User
 	}//User
 		
 	// Constructor with variable in real types 
-	public User(int id, int gameId, string privateIp, string publicIp, string playerName, int playerPing, bool isPlayerInGame, bool isGameHost){
+	public User(int id, string gameId, Team team, string privateIp, string publicIp, string playerName, int playerPing, bool isPlayerInGame, bool isGameHost){
 		this.id = id;
 		this.gameId = gameId;
+        this.cTeam = team;
 		this.privateIp = privateIp;
 		this.publicIp = publicIp;
         this.name = playerName;
@@ -63,6 +70,8 @@ public class User
 	public string UserToString(){
 		return id.ToString() + "$"
             +gameId.ToString()+"$"
+            +(int)cTeam + "$"
+            + score + "$"
             +privateIp+"$"
             +publicIp+"$"
             +name+"$"
@@ -74,7 +83,7 @@ public class User
 	// Create an User object with parameters from a string
 	public static User UserToObject(string parseUser){
 		string[] values = parseUser.Split('$');
-		return new User(values[0], values[1], values[2],values[3], values[4], values[5], values[6], values[7]);
+		return new User(values[0], values[1], (Team)int.Parse(values[2]), int.Parse(values[3]), values[4], values[5], values[6], values[7], values[8], values[9]);
 	}//parseUser
 		
 	// Transform a userList (List<User>) on a string
@@ -100,7 +109,7 @@ public class User
 	}//ListToObject
 		
 	// Remove a user from his M - Return the modified userList
-	public static List<User> RemoveFromId(List<User> userList, int gameId){
+	public static List<User> RemoveFromId(List<User> userList, string gameId){
 		User removeUser = null;
 		for(int i = 0; i < userList.Count; i++){
 			if(gameId == userList[i].gameId){					
@@ -128,7 +137,7 @@ public class User
 	}//RemoveServer
 				
 	// Save the new status of a player - Return the modified userList
-	public static List<User> SavePlayerStatus(int gameId, bool isPlayerInGame, List<User> userList) {
+	public static List<User> SavePlayerStatus(string gameId, bool isPlayerInGame, List<User> userList) {
 		for(int i = 0; i < userList.Count; i++){
 			if(userList[i].gameId == gameId){
 				userList[i].isPlayerInGame = isPlayerInGame;
@@ -138,7 +147,7 @@ public class User
 	}//SavePlayerStatus
 				
 	// Search a player from his game id (return him as User object)
-	public static User SearchPlayer(int gameId, List<User> userList) {
+	public static User SearchPlayer(string gameId, List<User> userList) {
 		User searchUser = new User();
 		for(int i = 0; i < userList.Count; i++){
 			if(userList[i].gameId == gameId){
@@ -160,7 +169,7 @@ public class User
 	}//SearchPlayer
 		
 	// Check if a specific player is on the userList
-	public static bool inList(List<User> userList, int gameId){
+	public static bool inList(List<User> userList, string gameId){
 		for(int i = 0; i < userList.Count; i++){
 			if(userList[i].gameId == gameId){
 				return true;

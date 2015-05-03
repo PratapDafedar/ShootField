@@ -23,11 +23,11 @@ public class MGamePlayerList : MonoBehaviour {
 			int listSizeX = 0;
 			int listSizeY = 0;
 			if(35*(menuSrc.networkSrc.playerList.Count)+15 > 225){
-				listSizeY=225;
-				listSizeX=215;
+				listSizeY=225 + 70;
+				listSizeX=400;
 			}else {
-				listSizeY=35*(menuSrc.networkSrc.playerList.Count)+15;
-				listSizeX=200;
+				listSizeY=35*(menuSrc.networkSrc.playerList.Count)+15 + 70;
+				listSizeX=400;
 			}
 			
 			int listPosX = margin;
@@ -36,7 +36,7 @@ public class MGamePlayerList : MonoBehaviour {
 					
 			int sizeY = 10;			
 			
-			if(menuSrc.viewPlayerList){
+			if(menuSrc.viewPlayerList || Input.GetKey (KeyCode.Tab)){
 				GUI.BeginGroup(listMenu, "");			
 				GUI.Box(new Rect(0,0,listSizeX, listSizeY), "");				
 				sizeY=10;				
@@ -44,40 +44,40 @@ public class MGamePlayerList : MonoBehaviour {
 				listScroll = GUI.BeginScrollView (new Rect (0,sizeY,listSizeX,listSizeY-20), listScroll, new Rect(0,sizeY, listSizeX-20, 35*(menuSrc.networkSrc.playerList.Count)-5));						
 				
 				
-				if(menuSrc.networkSrc.isGameHost && menuSrc.networkSrc.playerList.Count > 1){ // If I'm the host :			
-					MUser.PingPlayers(menuSrc.networkSrc);
-				}				
+				if(GameManager.Instance.cPlayer.isGameHost && menuSrc.networkSrc.playerList.Count > 1)
+                { // If I'm the host :			
+					User.PingPlayers(menuSrc.networkSrc);
+				}
 				
-				for(int i = 0; i < menuSrc.networkSrc.playerList.Count; i++){									
-					GUI.Box(new Rect(10,sizeY,180, 30), "");	
-					GUI.Label(new Rect(15,sizeY+6,170, 20), menuSrc.networkSrc.playerList[i].name+" "+MUser.GetHostMessage(i, menuSrc.networkSrc)+" : "+MUser.GetPlayerPing(i, menuSrc.networkSrc)+" ms");
-					
-					// USE IF ONLY IF YOU HAVE MULTIONLINE : 
-					/*if(menuSrc.networkSrc.playerDataSrc.useFriendlist){
-						if(menuSrc.networkSrc.playerList[i].gameId != menuSrc.networkSrc.playerDataSrc.gameId && menuSrc.networkSrc.playerDataSrc.isOnline) {
-							
-							if(!MOFriend.IsInList(menuSrc.networkSrc.playerDataSrc.friendList, menuSrc.networkSrc.playerList[i].id)) {
-								if(GUI.Button(new Rect(165,sizeY+6,20, 20), "+")){
-									menuSrc.networkSrc.AskFriend(menuSrc.networkSrc.playerList[i]);
-								}
-							} else {
-								GUI.Label(new Rect(165,sizeY+6,20, 20), "  +");
-							}
-						}
-					}
-					if(menuSrc.networkSrc.isGameHost && menuSrc.networkSrc.playerList[i].gameId != menuSrc.networkSrc.playerDataSrc.gameId){
-						int sizeZ = 165;
-						if(menuSrc.networkSrc.playerDataSrc.isOnline && menuSrc.networkSrc.playerDataSrc.useFriendlist){
-							sizeZ = 140;
-						}
-						if(GUI.Button(new Rect(sizeZ,sizeY+6,20, 20), "x")){
-							menuSrc.networkSrc.ExcludePlayer(menuSrc.networkSrc.playerList[i]);				
-						}
-					}
-                     */
-					//---
-					sizeY+=35;
-				}								
+                GUI.Box(new Rect(10, sizeY, 180, 30), "TEAM - BLUE       : " + GameManager.Instance.teamScoreBlue);
+                sizeY += 35;
+				for(int i = 0; i < menuSrc.networkSrc.playerList.Count; i++)
+                {
+                    if (menuSrc.networkSrc.playerList[i].cTeam == User.Team.BLUE)
+                    {
+                        //GUI.Box(new Rect(10, sizeY, 180, 30), "");
+                        GUI.Label(new Rect(15, sizeY + 6, 350, 20), menuSrc.networkSrc.playerList[i].name + " " 
+                                                                    + User.GetHostMessage(i, menuSrc.networkSrc) + " : " 
+                                                                    + User.GetPlayerPing(i, menuSrc.networkSrc) + " ms"
+                                                                    + " <--> Kills :   " + menuSrc.networkSrc.playerList[i].score);
+                        sizeY += 35;
+                    }
+				}
+
+                GUI.Box(new Rect(10, sizeY, 180, 30), "TEAM - RED       : " + GameManager.Instance.teamScoreRed);
+                sizeY += 35;
+                for (int i = 0; i < menuSrc.networkSrc.playerList.Count; i++)
+                {
+                    if (menuSrc.networkSrc.playerList[i].cTeam == User.Team.RED)
+                    {
+                        //GUI.Box(new Rect(10, sizeY, 180, 30), "");
+                        GUI.Label(new Rect(15, sizeY + 6, 350, 20), menuSrc.networkSrc.playerList[i].name + " " 
+                                                                    + User.GetHostMessage(i, menuSrc.networkSrc) + " : "
+                                                                    + User.GetPlayerPing(i, menuSrc.networkSrc) + " ms"
+                                                                    + " <--> Kills :   " + menuSrc.networkSrc.playerList[i].score);
+                        sizeY += 35;
+                    }
+                }		
 				GUI.EndScrollView();
 				GUI.EndGroup();					
 			}

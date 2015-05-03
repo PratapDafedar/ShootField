@@ -5,7 +5,17 @@ using System.Collections;
 public class Health : MonoBehaviour
 {
     public float maxHealth = 100.0f;
-    public float health = 100.0f;
+    public float cHealth 
+    {
+        get {
+            return charSynch.cUser.health;
+        }
+        set {
+            charSynch.cUser.health = value;
+            charSynch.cachedHealth = value;
+        }
+    }
+
     public float regenerateSpeed = 0.0f;
     public bool invincible = false;
     public bool dead = false;
@@ -26,11 +36,13 @@ public class Health : MonoBehaviour
     private float damageEffectCenterYOffset;
 
     private float colliderRadiusHeuristic = 1.0f;
+    private CharacterSynchronizer charSynch;
 
-
-    void Awake(){
+    void Awake()
+    {
 	    enabled = false;
-	    if (damagePrefab) {
+	    if (damagePrefab) 
+        {
 		    if (damageEffectTransform == null)
 			    damageEffectTransform = transform;
 		    GameObject effect = Spawner.Spawn (damagePrefab, Vector3.zero, Quaternion.identity);
@@ -47,6 +59,7 @@ public class Health : MonoBehaviour
 		    scorchMark = GameObject.Instantiate(scorchMarkPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 		    scorchMark.SetActive (false);
 	    }
+        charSynch = GetComponent<CharacterSynchronizer>();
     }
 
     public void OnDamage(float amount, Vector3 fromDirection)
@@ -71,7 +84,7 @@ public class Health : MonoBehaviour
 	#endif
 	*/
 
-	health -= amount;
+	cHealth -= amount;
 	damageSignals.SendSignals (this);
 	lastDamageTime = Time.time;
 
@@ -96,11 +109,11 @@ public class Health : MonoBehaviour
 	}
 
 	// Die if no health left
-	if (health <= 0)
+	if (cHealth <= 0)
 	{
 		//**GameScore.RegisterDeath (gameObject);
 
-		health = 0;
+		cHealth = 0;
 		dead = true;
 		dieSignals.SendSignals (this);
 		enabled = false;
@@ -119,6 +132,11 @@ public class Health : MonoBehaviour
             tempAngle.y = Random.Range (0.0f, 90.0f);
             scorchMark.transform.eulerAngles = tempAngle;
 		}
+
+        if (GameManager.Instance.cPlayer.isGameHost)
+        {
+            GameManager.Instance.CheckRoundFinish();
+        }
 	}
 }
 
@@ -134,12 +152,12 @@ public class Health : MonoBehaviour
 	    if (regenerateSpeed > 0.0f) {
 		    while (enabled) {
 			    if (Time.time > lastDamageTime + 3) {
-				    health += regenerateSpeed;
+				    cHealth += regenerateSpeed;
 
 				    yield return 0;
 
-				    if (health >= maxHealth) {
-					    health = maxHealth;
+				    if (cHealth >= maxHealth) {
+					    cHealth = maxHealth;
 					    enabled = false;
 				    }
 			    }

@@ -64,7 +64,7 @@ public class MMenu : MonoBehaviour
         {
             parameters = GameObject.Find("LevelOption").GetComponent<MGameParameter>();	
 		} catch(NullReferenceException){
-            parameters = (Instantiate(Resources.Load("LevelOption")) as GameObject).GetComponent<MGameParameter>();	
+            parameters = (Instantiate(Resources.Load("Main/LevelOption")) as GameObject).GetComponent<MGameParameter>();	
 		}
 	}//Awake
 	

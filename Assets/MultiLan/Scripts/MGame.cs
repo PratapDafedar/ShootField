@@ -23,7 +23,7 @@ namespace MultiPlayer {
 		public bool isOnNetwork;
 		public bool isOnDedicatedServer;
 		
-		public int hostId;
+		public string hostId;
 		public string hostName;
 		public string hostPrivateIp;
 		public string hostPublicIp;
@@ -45,7 +45,7 @@ namespace MultiPlayer {
 			bool isStarted,
 			bool isPrivate,
 			string hostName,
-			int hostId,
+			string hostId,
 			string mapName,
 			string hostPrivateIp,
 			string hostPublicIp,			
@@ -102,7 +102,7 @@ namespace MultiPlayer {
 			this.register = register; 
 			this.registerDate = registerDate; 
 				try{
-				this.hostId = int.Parse(hostId); 
+				this.hostId = hostId; 
 			} catch(FormatException){}			
 			this.hostName = hostName; 
 			this.hostPrivateIp = hostPrivateIp; 
@@ -134,7 +134,7 @@ namespace MultiPlayer {
 			bool isPrivate,
 			bool isOnNetwork,
 			bool isOnDedicatedServer,
-			int hostId,
+			string hostId,
 			string hostName,
 			string hostPrivateIp,
 			string hostPublicIp,
@@ -192,7 +192,7 @@ namespace MultiPlayer {
 			if(val[12] == "1") { this.isPrivate= true; } else { this.isPrivate=false; };
 			if(val[13] == "1") { this.isOnNetwork= true; } else { this.isOnNetwork=false; };
 			if(val[14] == "1") { this.isOnDedicatedServer= true; } else { this.isOnDedicatedServer=false; };
-			this.hostId = int.Parse(val[15]);
+			this.hostId = val[15];
 			this.hostName = val[16];
 			this.hostPrivateIp = val[17];
 			this.hostPublicIp = val[18];

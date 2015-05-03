@@ -77,7 +77,9 @@ public class CameraFollow : MonoBehaviour
             return;
         }
 
-		
+        if (target == null)
+            return;
+        
 		Vector3 targetCamPos = target.position + offset;
 					
 		float acceleration = Vector3.Distance (transform.position, targetCamPos);

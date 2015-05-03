@@ -1,17 +1,32 @@
 ﻿using UnityEngine;
 using System.Collections;
+using uLink;
 
-public class CharacterSynchronizer : MonoBehaviour 
+public class CharacterSynchronizer : uLink.MonoBehaviour
 {
     public TriggerOnMouseOrJoystick fireInputHandler;
     public PerFrameRaycast          perFrameRaycast;
     public LaserScope               laserScope;
 
-    public SignalSender mouseDownSignals;
-    public SignalSender mouseUpSignals;
+    public SignalSender             mouseDownSignals;
+    public SignalSender             mouseUpSignals;
+
+    [HideInInspector]
+    public int characterID;
+
+    public User cUser
+    {
+        get
+        {
+            return User.SearchPlayerId (characterID, NetworkManager.Instance.playerList);
+        }
+    }
+
+    public float cachedHealth;
+    private float oldHealth = 100;
 
     private PlayerMoveController playerMoveController;
-    private NetworkView netView;
+    private uLinkNetworkView netView;
 
     float positionX = 0;
     float positionZ = 0;
@@ -21,23 +36,26 @@ public class CharacterSynchronizer : MonoBehaviour
     private bool fireStateSync = false; 
 
     float netDeltaTime = 0;
+    
 
 	// Use this for initialization
 	void Start () 
     {
-        netView = this.gameObject.GetComponent<NetworkView>();
+        cachedHealth = 100;
+
+        netView = this.gameObject.GetComponent<uLinkNetworkView>();
         if (!netView.isMine)
         {
             this.GetComponent<PlayerMoveController>().isControlLocked = true;
             
             //Disable some input input handlers on clientside.
             fireInputHandler.enabled = false;
-            //perFrameRaycast.enabled = false;
-            //laserScope.enabled = false;
+
+            GameManager.Instance.proxyPlayerList.Add (this.gameObject);
         }
 	}
 
-    void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+    void uLink_OnSerializeNetworkView(uLink.BitStream stream, uLink.NetworkMessageInfo info)
     {
         if (stream.isWriting)
         {
@@ -64,6 +82,25 @@ public class CharacterSynchronizer : MonoBehaviour
 
 	void Update ()
     {
+        StateSynch();
+
+        if (cachedHealth != oldHealth)
+        {
+            SynchData ((int)cachedHealth);
+            oldHealth = cachedHealth;
+        }
+
+        if (cachedHealth <= 0)
+        {
+            if (GameManager.Instance.cPlayer.isGameHost)
+            {
+                GameManager.Instance.CheckRoundFinish();
+            }
+        }
+    }
+
+    private void StateSynch()
+    {
         if (!netView.isMine)
         {
             Vector3 cPos = transform.position;
@@ -88,7 +125,7 @@ public class CharacterSynchronizer : MonoBehaviour
                 fireStateSync = isFiring;
             }
         }
-	}
+    }
 
     void OnStartFire()
     {
@@ -98,5 +135,18 @@ public class CharacterSynchronizer : MonoBehaviour
     void OnStopFire()
     {
         isFiring = false;
+    }
+
+    /////////////////////  [RPC]  /////////////////////
+
+    void SynchData (int _health)
+    {
+        networkView.RPC("ReceiveData", uLink.RPCMode.Others, _health);	
+    }
+
+    [RPC]
+    void ReceiveData (int _health)
+    {
+        cUser.health = _health;
     }
 }

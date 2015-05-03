@@ -19,11 +19,12 @@ public class OnScreenLogger : MonoBehaviour {
 		else {
 			DestroyImmediate (this);
 		}
+		Application.logMessageReceived += HandleLog;
 	}
 	
 	void Start ()
 	{
-		Application.RegisterLogCallback (HandleLog);
+
 	}
 
 	void HandleLog(string logString, string stackTrace, LogType type)

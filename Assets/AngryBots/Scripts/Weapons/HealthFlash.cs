@@ -15,7 +15,7 @@ public class HealthFlash : MonoBehaviour
     }
 
     void  Update (){
-	    float relativeHealth = playerHealth.health * oneOverMaxHealth;
+	    float relativeHealth = playerHealth.cHealth * oneOverMaxHealth;
 	    healthMaterial.SetFloat ("_SelfIllumination", relativeHealth * 2.0f * healthBlink);
 	
 	    if (relativeHealth < 0.45f) 

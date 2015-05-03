@@ -118,6 +118,11 @@ public class PlayerMoveController : MonoBehaviour
 		    joystickRight.enabled = true;
     }
 
+    void OnDestroy()
+    {
+        DestroyImmediate(cursorObject.gameObject);
+    }
+
     private bool  button8Down = false;
     private bool  button9Down = false;
     private int moveF;

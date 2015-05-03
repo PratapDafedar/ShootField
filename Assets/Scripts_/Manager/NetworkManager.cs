@@ -3,8 +3,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using MultiPlayer;
+using uLink;
 
-public class NetworkManager : MonoBehaviour
+public class NetworkManager : uLink.MonoBehaviour
 {
     // Global parameters
     public string mainMenuName = "Lobby";
@@ -21,7 +22,6 @@ public class NetworkManager : MonoBehaviour
     public bool isGameServerWaitingPlayers = false;
     public bool isGameServerRebuildSuccess = false;
     public bool isGameServerRebuildFailed = false;
-    public bool isGameHost;
 
     // Player parameters	
     public bool isSearchGame = false;
@@ -41,7 +41,6 @@ public class NetworkManager : MonoBehaviour
     public bool isExculdePlayer = false;
     public bool isPlayerExculde = false;
     public User excludedPlayer;
-    public NetworkPlayer excludedNetworkPlayer;
     public bool alwaysExcudePlayer = false;
 
     // FrienList
@@ -54,7 +53,6 @@ public class NetworkManager : MonoBehaviour
 
     //Dedicated
     public bool isDedicatedServerBreakDown = false;
-
 
     public static NetworkManager Instance
     {
@@ -76,14 +74,11 @@ public class NetworkManager : MonoBehaviour
     }
     private static NetworkManager _instance;
 
-    public NetworkView networkView;
+    public uLink.NetworkView networkView;
 
     private void InitNetworkManager()
-    {
-        networkView = this.gameObject.AddComponent<NetworkView>();
-        networkView.stateSynchronization = NetworkStateSynchronization.Off;
-        networkView.observed = this.transform;
-        networkView.viewID = new NetworkViewID ();
+    {       
+
         gameInfo = new MGame();
     }
 
@@ -95,6 +90,7 @@ public class NetworkManager : MonoBehaviour
     public static void DestroyNetworkManager()
     {
         Application.LoadLevel("Lobby");
+        Cursor.lockState = CursorLockMode.None;
         DestroyImmediate(NetworkManager.Instance.gameObject);
     }
 
@@ -108,31 +104,40 @@ public class NetworkManager : MonoBehaviour
         if (_instance != this)
         {
             DestroyImmediate (this.gameObject);
+            return;
         }
+        _instance.InitNetworkManager();
 
         DontDestroyOnLoad(this);
         playerList = new List<User>(); 
-
-        Network.sendRate = 30;
     }
 
     void Start()
     {
         menuSrc = GameObject.Find("Menu").GetComponent<MMenu>();
         parameters = GameObject.Find("LevelOption").GetComponent<MGameParameter>();
-
+        networkView = GetComponent<uLink.NetworkView>();
         chatContent = new List<string>();
     }
 
     //---BASIC FUNCTIONS
     //------------------------------------------------------
     //------------------- EVENTS FUNCTIONS  ------------------ //	
-    void OnServerInitialized()
+    void uLink_OnServerInitialized ()
     {
         // Save host parameters
-        isGameHost = true;
+        GameManager.Instance.cPlayer.isGameHost = true;
+
+        uLink.NetworkPlayer player = uLink.Network.player;
+
+        Debug.Log("Server successfully started on port " + uLink.Network.listenPort + 
+            "\nInfo :" + uLink.Network.player.ToString());
+        uLink.MasterServer.ipAddress = "127.0.0.1";
+        uLink.MasterServer.port = uLink.Network.player.port;
+        uLink.MasterServer.RegisterHost("ShootField", "ShootField", "@pratap.", "Multiplayer", Application.loadedLevelName);
+
         // Server save his id around the game
-        GameManager.Instance.cPlayer.id = int.Parse(Network.player.ToString());
+        GameManager.Instance.cPlayer.id = int.Parse(uLink.Network.player.id.ToString());
         this.gameInfo.totalPlayer = 1;
 
         // Add server to playerList
@@ -144,19 +149,25 @@ public class NetworkManager : MonoBehaviour
 
         playerList.Clear(); // Clear the playerList 
         // Save the host on the playerList
-        playerList.Add(new User(GameManager.Instance.cPlayer.id, 
-            GameManager.Instance.cPlayer.id,
-        GameManager.Instance.cPlayer.privateIp, 
-        GameManager.Instance.cPlayer.publicIp,
-        "true", 
-        0, 
-        inGame, 
-        true));
+        playerList.Add(new User(GameManager.Instance.cPlayer.id,
+                        uLink.Network.player.externalEndpoint.ToString (),
+                        GameManager.Instance.cPlayer.cTeam,
+                        GameManager.Instance.cPlayer.privateIp,
+                        GameManager.Instance.cPlayer.publicIp,
+                        GameManager.Instance.cPlayer.name,
+                        0,
+                        inGame, 
+                        true));
         StartGame(false); // Try to start the game 
     }//OnServerInitialized	
 
+    void uLink_OnPlayerApproval(uLink.NetworkPlayerApproval approval)
+    {
+        approval.Approve();
+    }
+
     // OnFailedToConnect : call on the client
-    void OnFailedToConnect(NetworkConnectionError error)
+    void uLink_OnFailedToConnect (uLink.NetworkConnectionError error)
     {
         if (!isSearchGame)
         {
@@ -167,25 +178,22 @@ public class NetworkManager : MonoBehaviour
             else
             {
                 string errorMsg = "";
-                if (error == NetworkConnectionError.TooManyConnectedPlayers)
+                if (error == uLink.NetworkConnectionError.TooManyConnectedPlayers)
                 {
                     errorMsg = menuSrc.text.nmErrorMaxPlayers;
                 }
-                else if (error == NetworkConnectionError.InvalidPassword)
+                else if (error == uLink.NetworkConnectionError.InvalidPassword)
                 {
                     errorMsg = menuSrc.text.nmErrorPassword;
                 }
-                else if (error == NetworkConnectionError.AlreadyConnectedToServer)
-                {
-                    errorMsg = menuSrc.text.nmErrorAlreadyConnect;
-                }
-                else if (error == NetworkConnectionError.AlreadyConnectedToAnotherServer)
+                else if (error == uLink.NetworkConnectionError.AlreadyConnectedToAnotherServer)
                 {
                     errorMsg = menuSrc.text.nmErrorToAnotherServer;
                 }
+                errorMsg += "-->Type : " + error.ToString();
                 menuSrc.networkJoinMessage[0] = gameInfo.isOnline.ToString();
                 menuSrc.networkJoinMessage[1] = menuSrc.text.nmErrorConnexion + errorMsg;
-                Destroy(gameObject);
+                print (errorMsg);
             }
         }
         else if (isSearchGame && menuSrc.useLan)
@@ -197,59 +205,68 @@ public class NetworkManager : MonoBehaviour
     }//OnFailedToConnect
 
     // OnPlayerConnected : call on the server
-    void OnPlayerConnected(NetworkPlayer player)
+    void uLink_OnPlayerConnected(uLink.NetworkPlayer player)
     {
-        GetComponent<NetworkView>().RPC("DisabledPlayers", player);
+        GetComponent<uLinkNetworkView>().RPC("DisabledPlayers", player);
     }//OnPlayerConnected	
 
     // OnPlayerDisconnected : call on the server
-    void OnPlayerDisconnected(NetworkPlayer player)
+    void uLink_OnPlayerDisconnected(uLink.NetworkPlayer player)
     {
-        if (User.inList(playerList, int.Parse(player.ToString())))
+        if (User.inList(playerList, player.ToString()))
         {
             gameInfo.totalPlayer--;
-            GetComponent<NetworkView>().RPC("RefreshPlayerCount", RPCMode.All, gameInfo.totalPlayer);
+            networkView.RPC("RefreshPlayerCount", uLink.RPCMode.All, gameInfo.totalPlayer);
             
-            playerList = User.RemoveFromId(playerList, int.Parse(player.ToString()));
+            playerList = User.RemoveFromId(playerList, player.ToString());
             playerList = User.PingSort(playerList);	// Sort the list by Ping
-            GetComponent<NetworkView>().RPC("RefreshUserList", RPCMode.Others, User.ListToString(playerList));
-            GetComponent<NetworkView>().RPC("RemoveInPositionList", RPCMode.Others, int.Parse(player.ToString()));
+            networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(playerList));
+            networkView.RPC("RemoveInPositionList", uLink.RPCMode.Others, int.Parse(player.ToString()));
         }
 
-        Network.RemoveRPCs(player);
-        Network.DestroyPlayerObjects(player);
+        uLink.Network.RemoveRPCs(player);
+        uLink.Network.DestroyPlayerObjects(player);
     }//OnPlayerDisconnected
 
     // OnConnectedToServer : call on the client
-    void OnConnectedToServer()
+    void uLink_OnConnectedToServer()
     {
         if (!isSearchGame)
-        {	 // If we just searching games 
+        {	// If we just searching games 
+            GameManager.Instance.cPlayer.id = uLink.Network.player.id;
+            GameManager.Instance.cPlayer.gameId = uLink.Network.player.externalEndpoint.ToString ();
+            GameManager.Instance.cPlayer.privateIp = uLink.Network.player.internalIP;
+            GameManager.Instance.cPlayer.publicIp = uLink.Network.player.externalIP;
+
             // Client save his id around the game
-            GameManager.Instance.cPlayer.id = int.Parse(Network.player.ToString());
-            networkView.RPC("AddPlayer", RPCMode.Server,
-                GameManager.Instance.cPlayer.id,
-                GameManager.Instance.cPlayer.gameId,
-                true,
-                GameManager.Instance.cPlayer.privateIp,
-                GameManager.Instance.cPlayer.publicIp,
-                gameInfo.isOnNetwork,
-                GameManager.Instance.cPlayer.isPlayerInGame,
-                false, Network.player);
+            GameManager.Instance.cPlayer.id = int.Parse(uLink.Network.player.id.ToString());
+            networkView.RPC("AddPlayer", uLink.RPCMode.Others,
+                                        GameManager.Instance.cPlayer.id,
+                                        GameManager.Instance.cPlayer.gameId,
+                                        GameManager.Instance.cPlayer.name,
+                                        (int) GameManager.Instance.cPlayer.cTeam,
+                                        GameManager.Instance.cPlayer.privateIp,
+                                        GameManager.Instance.cPlayer.publicIp,
+                                        gameInfo.isOnNetwork,
+                                        GameManager.Instance.cPlayer.isPlayerInGame,
+                                        false,
+                                        uLink.Network.player);
+
+            StartGame(false);
         }
         else
         {
             // Else, if the client is just searching a game : call SearchGame on the server
-            GetComponent<NetworkView>().RPC("SearchGameInfo", RPCMode.Server, Network.player);
+            GetComponent<uLinkNetworkView>().RPC("SearchGameInfo", uLink.RPCMode.Others, uLink.Network.player);
         }
     } //OnConnectedToServer
 
 
     // OnDisconnectedFromServer : call on the client
-    void OnDisconnectedFromServer()
+    void uLink_OnDisconnectedFromServer()
     {
         // If we are not just searching a game or if we have not been exculded 
-        if (!isSearchGame && !isPlayerExculde && Network.peerType != NetworkPeerType.Server)
+        if (!isSearchGame && !isPlayerExculde && uLink.Network.peerType != uLink.NetworkPeerType.Server)
         {
             // All the game will be rebuilt with a new host (if we find one)			
             gameInfo.totalPlayer = 0;// Put the total player on 0	
@@ -284,24 +301,26 @@ public class NetworkManager : MonoBehaviour
             EnabledPlayer(); // Enabled the render of the other players
             if (GameObject.Find("Spawns") != null)
             {
-                MSpawn spawnSrc = GameObject.Find("Spawns").GetComponent<MSpawn>();
+                SpawnManager spawnSrc = GameObject.Find("Spawns").GetComponent<SpawnManager>();
                 playerPrefab = spawnSrc.playerPrefab;
+
+                spawnSrc.SpawnPlayer (GameManager.Instance.cPlayer);
             }
 
             gameInfo.isStarted = true;
             GameManager.Instance.cPlayer.isPlayerInGame = true;
 
             // Save the server new statut (in game)
-            if (isGameHost)
+            if (GameManager.Instance.cPlayer.isGameHost)
             {
                 playerList = User.SavePlayerStatus(GameManager.Instance.cPlayer.gameId, true, playerList);
                 // Send my new status to the clients
-                GetComponent<NetworkView>().RPC("RefreshUserList", RPCMode.Others, User.ListToString(playerList));
+                GetComponent<uLink.NetworkView>().RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(playerList));
             }
             else
             {
                 // Send to the server that I'm now in game
-                GetComponent<NetworkView>().RPC("RefreshPlayerStatus", RPCMode.Server, GameManager.Instance.cPlayer.gameId, true);
+                GetComponent<uLink.NetworkView>().RPC("RefreshPlayerStatus", uLink.RPCMode.Others, GameManager.Instance.cPlayer.gameId, true);
             }
         }
     }//OnLevelWasLoaded		
@@ -313,22 +332,22 @@ public class NetworkManager : MonoBehaviour
     {
         if (usePass)
         {
-            Network.incomingPassword = pass;
+            uLink.Network.incomingPassword = pass;
         }
-        NetworkConnectionError error = Network.InitializeServer(maxPlayer, port, false);
-        if (error != NetworkConnectionError.NoError)
+        uLink.NetworkConnectionError error = uLink.Network.InitializeServer(maxPlayer, port);
+        if (error != uLink.NetworkConnectionError.NoError)
         {
             menuSrc.networkCreateMessage[0] = isOnline.ToString();
             menuSrc.networkCreateMessage[1] = menuSrc.text.nmErrorGameCreation;
-            if (error == NetworkConnectionError.CreateSocketOrThreadFailure)
+            if (error == uLink.NetworkConnectionError.CreateSocketOrThreadFailure)
             {
                 menuSrc.networkCreateMessage[1] += menuSrc.text.nmErrorUsedPort;
             }
-            else if (error == NetworkConnectionError.InvalidPassword)
+            else if (error == uLink.NetworkConnectionError.InvalidPassword)
             {
                 menuSrc.networkCreateMessage[1] += menuSrc.text.nmErrorPassword;
             }
-            else if (error == NetworkConnectionError.AlreadyConnectedToAnotherServer)
+            else if (error == uLink.NetworkConnectionError.AlreadyConnectedToAnotherServer)
             {
                 menuSrc.networkCreateMessage[1] += menuSrc.text.nmErrorToAnotherServer;
             }
@@ -337,7 +356,7 @@ public class NetworkManager : MonoBehaviour
         {
             this.gameInfo = new MGame(id, name, port, parameters.maps[0], 0, 1, maxPlayer, usePass,
             false, register, registerDate, isOnline, isPrivate, isOnNetwork, isOnDedicatedServer,
-            int.Parse(Network.player.ToString()), GameManager.Instance.cPlayer.name, GameManager.Instance.cPlayer.privateIp, GameManager.Instance.cPlayer.publicIp, null);
+            uLink.Network.player.guid, GameManager.Instance.cPlayer.name, GameManager.Instance.cPlayer.privateIp, GameManager.Instance.cPlayer.publicIp, null);
         }
     }//StartServer
 
@@ -353,11 +372,11 @@ public class NetworkManager : MonoBehaviour
             }
             if (isGameUsePassword)
             {
-                Network.Connect(ip, port, password);
+                uLink.Network.Connect(ip, port, password);
             }
             else
             {
-                Network.Connect(ip, port);
+                uLink.Network.Connect(ip, port);
             }
         }
     }//Join Server
@@ -365,7 +384,7 @@ public class NetworkManager : MonoBehaviour
     public void SearchGame(int port, string ip)
     {
         isSearchGame = true;
-        Network.Connect(ip, port);
+        uLink.Network.Connect(ip, port);
     }//SearchGame
 
     public void StartGame(bool canLoadGame)
@@ -389,7 +408,7 @@ public class NetworkManager : MonoBehaviour
         { // Else, load the waitroom
             if (Application.loadedLevelName != waitRoomName && waitRoomName != "" && waitRoomName != null)
             { // If the map is not already load
-                Application.LoadLevel("Room");
+                GameManager.LoadGameRoom();
             }
         }
     }//StartGame	
@@ -398,13 +417,13 @@ public class NetworkManager : MonoBehaviour
     {
         if (playerList.Count > 1)
         { // If the list is not emtpy :			
-            for (int i = 0; i < Network.connections.Length; i++)
+            for (int i = 0; i < uLink.Network.connections.Length; i++)
             {
                 for (int j = 0; j < playerList.Count; j++)
                 {
-                    if (Network.connections[i].ToString().Equals(playerList[j].gameId.ToString()))
+                    if (uLink.Network.connections[i].ToString().Equals(playerList[j].gameId.ToString()))
                     {
-                        playerList[j].playerPing = Network.GetAveragePing(Network.connections[i]);
+                        playerList[j].playerPing = uLink.Network.GetAveragePing(uLink.Network.connections[i]);
                     }
                 }
             }
@@ -412,22 +431,22 @@ public class NetworkManager : MonoBehaviour
 
     }//PingPlayers
 
-    public NetworkPlayer SearchNetworkPlayer(int gameId)
+    public uLink.NetworkPlayer SearchNetworkPlayer(int gameId)
     {
-        for (int i = 0; i < Network.connections.Length; i++)
+        for (int i = 0; i < uLink.Network.connections.Length; i++)
         {
-            if (Network.connections[i].ToString().Equals(gameId.ToString()))
+            if (uLink.Network.connections[i].ToString().Equals(gameId.ToString()))
             {
-                return Network.connections[i];
+                return uLink.Network.connections[i];
             }
         }
-        return new NetworkPlayer();
+        return new uLink.NetworkPlayer();
     }//SearchNetworkPlayer
 
     // Chat function : call from the waitRoom or from the gameChat form sycronise chat
     public void SendChatMessage(string message)
     {
-        GetComponent<NetworkView>().RPC("ChatMessage", RPCMode.All, message);
+        networkView.RPC("ChatMessage", uLink.RPCMode.All, message);
     }//SendChatMessage
 
 
@@ -457,14 +476,14 @@ public class NetworkManager : MonoBehaviour
     public void PlayerSpawned()
     {
         // Send DisabledPlayers to all other players, so that players in waitroom can disabled my player
-        GetComponent<NetworkView>().RPC("DisabledPlayers", RPCMode.Others);
+        networkView.RPC("DisabledPlayers", uLink.RPCMode.Others);
         gameInfo.isStarted = true;
         GameManager.Instance.cPlayer.isPlayerInGame = true;
     }//PlayerSpawned
 
     public void ExitGame(bool onlineLogout)
     {
-        Network.Disconnect();  // Disconnect from the network
+        uLink.Network.Disconnect();  // Disconnect from the network
         GameManager.Instance.cPlayer.isPlayerInGame = false; // Put isInGame at false
         Destroy(gameObject); // Desrtoy the NetworkManager
         Application.LoadLevel("Lobby"); // Load the main menu	
@@ -482,7 +501,7 @@ public class NetworkManager : MonoBehaviour
         // Load the player in his previous position and rotation	
         try
         {
-            Network.Instantiate(playerPrefab, playerPrefabPosition, playerPrefabRotation, 0);
+            uLink.Network.Instantiate (playerPrefab, playerPrefab, playerPrefabPosition, playerPrefabRotation, 0);
         }
         catch (NullReferenceException)
         {
@@ -494,7 +513,7 @@ public class NetworkManager : MonoBehaviour
     //  DISABLED / ENABLED player 
     private void DisabledPlayer()
     {
-        if (!GetComponent<NetworkView>().isMine)
+        if (!GetComponent<uLinkNetworkView>().isMine)
         {
             GameObject[] gameArray = FindObjectsOfType(typeof(GameObject)) as GameObject[];
             for (int i = 0; i < gameArray.Length; i++)
@@ -519,7 +538,7 @@ public class NetworkManager : MonoBehaviour
 
     private void EnabledPlayer()
     {
-        if (!GetComponent<NetworkView>().isMine)
+        if (!GetComponent<uLinkNetworkView>().isMine)
         {
             GameObject[] gameArray = FindObjectsOfType(typeof(GameObject)) as GameObject[];
             for (int i = 0; i < gameArray.Length; i++)
@@ -538,7 +557,7 @@ public class NetworkManager : MonoBehaviour
                         }
                     }
                     // Ask player position to the server
-                    GetComponent<NetworkView>().RPC("AskPosition", RPCMode.Server, gameArray[i].GetComponent<NetworkView>().viewID, Network.player);
+                    networkView.RPC("AskPosition", uLink.RPCMode.Others, gameArray[i].GetComponent<uLink.NetworkView>().viewID, uLink.Network.player);
                 }
             }
         }
@@ -548,37 +567,38 @@ public class NetworkManager : MonoBehaviour
     //------------------- RPC FUNCTIONS  ------------------ //
     // Call by the client to the server to received game informations
     [RPC]
-    void SearchGameInfo(NetworkPlayer player)
+    void SearchGameInfo(uLink.NetworkPlayer player)
     {
         // If it's not an online game
         if (!gameInfo.isOnline)
         {
             // Go search the games informations
-            GetComponent<NetworkView>().RPC("GetGameInfos", player, gameInfo.GameToString(), false);
+            GetComponent<uLinkNetworkView>().RPC("GetGameInfos", player, gameInfo.GameToString(), false);
         }
         else
         { // Else			
             // Call GoNextGame to the client
-            GetComponent<NetworkView>().RPC("GoNextGame", player);
+            GetComponent<uLinkNetworkView>().RPC("GoNextGame", player);
         }
     }//SearchGameInfo
 
+
     // Call by the player, to the server, to be add on the playerList	
     [RPC]
-    void AddPlayer(int id, int gameId, string playerName, string privateIp, string publicIp, bool isOnNetwork, bool isPlayerInGame, bool isPlayerOnline, NetworkPlayer player)
-    {
+    void AddPlayer(int id, string gameId, string playerName, int teamID, string privateIp, string publicIp, bool isOnNetwork, bool isPlayerInGame, bool isPlayerOnline, uLink.NetworkPlayer player)
+    {        
         // If the game is private and that we are not on the network of the host
         // (check by comparing public ip)
         if (gameInfo.isPrivate && publicIp != GameManager.Instance.cPlayer.publicIp && !isOnNetwork)
         {
-            GetComponent<NetworkView>().RPC("CantJoinGame", player, 2); // We cannont join the game
+            GetComponent<uLinkNetworkView>().RPC("CantJoinGame", player, 2); // We cannont join the game
             return; // Exit the function here
         }
 
         // If the game is Online but the player is not connected
         if (gameInfo.isOnline && !isPlayerOnline)
         {
-            GetComponent<NetworkView>().RPC("CantJoinGame", player, 3); // We cannont join the game
+            GetComponent<uLinkNetworkView>().RPC("CantJoinGame", player, 3); // We cannont join the game
             return; // Exit the function here
         }
         // If the game is not yet started or if we don't use the wait room
@@ -592,24 +612,24 @@ public class NetworkManager : MonoBehaviour
                 inGame = true;
             }
             // Add the new player on the playerList
-            playerList.Add(new User(id, gameId, privateIp, publicIp, playerName, Network.GetAveragePing(player), inGame, false));
+            playerList.Add(new User(id, gameId, (User.Team)teamID, privateIp, publicIp, playerName, uLink.Network.GetAveragePing(player), inGame, false));
             // Sort the list by Ping
             playerList = User.PingSort(playerList);
 
             // Refresh the lists of the clients : send on everybody except the server
-            GetComponent<NetworkView>().RPC("RefreshUserList", RPCMode.Others, User.ListToString(playerList));
+            networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(playerList));
 
             // Send the game informations to the new player
-            GetComponent<NetworkView>().RPC("GetGameInfos", player, gameInfo.GameToString(), true);
+            networkView.RPC("GetGameInfos", player, gameInfo.GameToString(), true);
 
             // Send the game state and try to start game
-            GetComponent<NetworkView>().RPC("RefreshPlayerCount", RPCMode.Others, gameInfo.totalPlayer);
+            networkView.RPC("RefreshPlayerCount", uLink.RPCMode.Others, gameInfo.totalPlayer);
 
         }
         else
         {
             // Else, we cannot join the game : 
-            GetComponent<NetworkView>().RPC("CantJoinGame", player, 1);
+            GetComponent<uLinkNetworkView>().RPC("CantJoinGame", player, 1);
         }
     }//AddPlayer	
    
@@ -746,13 +766,99 @@ public class NetworkManager : MonoBehaviour
 
     // Call by a client to ther server, when a load the game
     [RPC]
-    void RefreshPlayerStatus(int playerId, bool isPlayerInGame)
+    void RefreshPlayerStatus(string playerId, bool isPlayerInGame)
     {
         // Save the new status of the player
         playerList = User.SavePlayerStatus(playerId, isPlayerInGame, playerList);
         // Call RefreshUserList on the other players
-        GetComponent<NetworkView>().RPC("RefreshUserList", RPCMode.Others, User.ListToString(playerList));
+        networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(playerList));        
     }//RefreshPlayerStatus
+
+    // Call by a host to restart round.
+    [RPC]
+    void RPC_RespawnAllPlayers (int teamScoreBlue, int teamScoreRed)
+    {
+        GameManager.Instance.teamScoreBlue = teamScoreBlue;
+        GameManager.Instance.teamScoreRed = teamScoreRed;
+
+        for (int i = 0; i < NetworkManager.Instance.playerList.Count; i++)
+        {
+            User tempPlayer = NetworkManager.Instance.playerList[i];
+            tempPlayer.health = 100;
+        }
+        GameManager.Instance.cPlayer.health = 100;
+
+        SpawnManager.Instance.SpawnPlayer (GameManager.Instance.cPlayer);
+    }
         
     //---RPC FUNCTIONS
+
+    ///////////////////////////////////////////////////////////////////
+    ///////////////// ROOM Handlers //////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    
+    public void ChangeMap_ ()
+    {
+        networkView.RPC("ChangeMap", uLink.RPCMode.All, gameInfo.mapKey);
+    }
+
+    public void LoadGame_(int newMapKey, int timerStart)
+    {
+        networkView.RPC("LoadGame", uLink.RPCMode.All, newMapKey, timerStart);	
+    }
+
+    public void AskStatus_(uLink.NetworkPlayer player)
+    {
+        networkView.RPC("AskStatus", uLink.RPCMode.Others, uLink.Network.player);
+    }
+
+    public void PrivateChatMessage_(string message)
+    {
+        networkView.RPC("PrivateChatMessage", uLink.RPCMode.All, message);	
+    }
+
+    ////////////////////////////[RPC]/////////////////////////////
+
+    // Change the map : call from server to clients when a choose a new map
+    [RPC]
+    void ChangeMap(int newMapKey)
+    {
+        gameInfo.mapKey = newMapKey;
+        gameInfo.mapName = parameters.maps[newMapKey];
+    }//ChangeMap
+
+    // Load the game : call from server to the clients when he click on "Start game"
+    [RPC]
+    void LoadGame(int newMapKey, int timerStart)
+    {
+        gameInfo.mapKey = newMapKey;
+        gameInfo.mapName = parameters.maps[newMapKey];
+        MWaitRoom.Instance.isLoading = true;
+        if (MWaitRoom.Instance.useLoadTimer)
+        { // If we use timer : start it
+            StartCoroutine(MWaitRoom.Instance.LoadPanel(timerStart));
+        }
+        else
+        { // Else : start the game directly
+            StartGame(true);
+        }
+    }//LoadGame
+
+    [RPC]
+    void AskStatus(uLink.NetworkPlayer player)
+    {
+        // If the game is currently loading
+        if (MWaitRoom.Instance && MWaitRoom.Instance.isLoading)
+        { // Make the new player start the timer with the current value
+            GetComponent<uLinkNetworkView>().RPC("LoadGame", player, gameInfo.mapKey, int.Parse(MWaitRoom.Instance.loadGameCount));
+        }
+    }//AskStatus
+
+    [RPC]
+    void PrivateChatMessage(string message)
+    {
+        chatContent.Add(message);
+        MWaitRoom.Instance.chatScroll = new Vector2(0, (20 * (chatContent.Count + 1)) - MWaitRoom.Instance.chatBox.height);
+    }//PrivateChatMessage
+	
 }

@@ -3,8 +3,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class GameManager : MonoBehaviour {
-
+public class GameManager : MonoBehaviour 
+{
     public static GameManager Instance
     {
         get
@@ -24,9 +24,13 @@ public class GameManager : MonoBehaviour {
     }
     private static GameManager _instance;
 
+    [SerializeField]
     public User cPlayer;
 
-    public List<User> onlinePlayers;
+    public List<GameObject> proxyPlayerList;
+
+    public int teamScoreBlue;
+    public int teamScoreRed;
 
     void Awake()
     {
@@ -34,8 +38,11 @@ public class GameManager : MonoBehaviour {
         {
             Instance = this;
             DontDestroyOnLoad(this);
+
             if (cPlayer == null)
+            {
                 cPlayer = new User();
+            }
         }
         else
         {
@@ -48,13 +55,71 @@ public class GameManager : MonoBehaviour {
         Application.LoadLevel("Lobby");
     }
     
-    public static void LoadGameArena ()
+    public static void LoadGameRoom ()
     {
-        Application.LoadLevel("GameArena");
+        Application.LoadLevel("Room");
+
+        //TODO://
+        Instance.teamScoreBlue = 0;
+        Instance.teamScoreRed = 0;
+        Instance.proxyPlayerList = new List<GameObject>();
     }
 
     public static void LoadLogin ()
     {
         Application.LoadLevel("Login");
+    }
+
+    public void RespawnAllPlayers ()
+    {
+        NetworkManager.Instance.networkView.RPC("RPC_RespawnAllPlayers", uLink.RPCMode.All, teamScoreBlue, teamScoreRed);
+
+        NetworkManager.Instance.networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(NetworkManager.Instance.playerList));
+    }
+
+    public void CheckRoundFinish()
+    {
+        bool isAllDeadBlue = false;
+        bool isAllDeadRed = false;
+
+        isAllDeadBlue = CheckTeamAliveState (User.Team.BLUE);
+        isAllDeadRed = CheckTeamAliveState(User.Team.RED);
+
+        if (isAllDeadBlue || isAllDeadRed)
+        {
+            if (isAllDeadRed)
+                teamScoreBlue ++;
+
+            if (isAllDeadBlue)
+                teamScoreRed ++;
+
+
+            RespawnAllPlayers ();
+        }
+    }
+
+    private static bool CheckTeamAliveState(User.Team team)
+    {
+        int deadCount = 0;
+        int playerCount = 0;
+
+        for (int i = 0; i < NetworkManager.Instance.playerList.Count; i++)
+        {
+            User tempPlayer = NetworkManager.Instance.playerList[i];
+            if (tempPlayer.cTeam == team)
+            {
+                if (tempPlayer.health <= 0)
+                {
+                    deadCount++;
+                }
+                playerCount++;
+            }
+        }
+
+        if (deadCount == playerCount)
+        {
+            return true;
+        }
+        return false;
     }
 }
