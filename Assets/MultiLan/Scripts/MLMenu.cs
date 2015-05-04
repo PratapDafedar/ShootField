@@ -701,12 +701,19 @@ public class MLMenu : MonoBehaviour {
             gameList.Clear();
         }
         List <uLink.HostData> hosts = new List<uLink.HostData> (uLink.MasterServer.PollAndDiscoverLocalHosts("ShootField", serverPort, 1));
-        
-        uLink.HostData[] hosts_ = uLink.MasterServer.PollAndRequestHostList ("ShootField", 2); 
 
-        if (hosts != null && hosts_ != null && hosts_.Length > 0)
+        try
         {
-            hosts.AddRange(hosts_);
+            uLink.HostData[] hosts_ = uLink.MasterServer.PollAndRequestHostList("ShootField", 2);
+
+            if (hosts != null && hosts_ != null && hosts_.Length > 0)
+            {
+                hosts.AddRange(hosts_);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError (e.Message);
         }
 
         if (hosts != null && hosts.Count > 0)

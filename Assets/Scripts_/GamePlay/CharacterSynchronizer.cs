@@ -22,7 +22,9 @@ public class CharacterSynchronizer : uLink.MonoBehaviour
         }
     }
 
-    public float cachedHealth;
+    [HideInInspector]
+    public float cachedHealth = 100;
+    [HideInInspector]
     private float oldHealth = 100;
 
     private PlayerMoveController playerMoveController;
@@ -41,9 +43,10 @@ public class CharacterSynchronizer : uLink.MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-        cachedHealth = 100;
+        oldHealth = cachedHealth = 100;
 
         netView = this.gameObject.GetComponent<uLinkNetworkView>();
+
         if (!netView.isMine)
         {
             this.GetComponent<PlayerMoveController>().isControlLocked = true;
@@ -84,17 +87,17 @@ public class CharacterSynchronizer : uLink.MonoBehaviour
     {
         StateSynch();
 
-        if (cachedHealth != oldHealth)
+        if (GameManager.Instance.cPlayer.isGameHost)
         {
-            SynchData ((int)cachedHealth);
-            oldHealth = cachedHealth;
-        }
-
-        if (cachedHealth <= 0)
-        {
-            if (GameManager.Instance.cPlayer.isGameHost)
+            if (cachedHealth != oldHealth)
             {
-                GameManager.Instance.CheckRoundFinish();
+                SynchData ((int)cachedHealth);
+                oldHealth = cachedHealth;
+            }
+
+            if (cachedHealth <= 0)
+            {
+                    GameManager.Instance.CheckRoundFinish();
             }
         }
     }
@@ -135,6 +138,12 @@ public class CharacterSynchronizer : uLink.MonoBehaviour
     void OnStopFire()
     {
         isFiring = false;
+    }
+
+    void uLink_OnNetworkInstantiate(uLink.NetworkMessageInfo info)
+    {
+        int id = info.networkView.initialData.Read<int>();        
+        characterID = id;
     }
 
     /////////////////////  [RPC]  /////////////////////

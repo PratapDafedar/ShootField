@@ -132,6 +132,7 @@ public class NetworkManager : uLink.MonoBehaviour
 
         Debug.Log("Server successfully started on port " + uLink.Network.listenPort + 
             "\nInfo :" + uLink.Network.player.ToString());
+
         uLink.MasterServer.ipAddress = "127.0.0.1";
         uLink.MasterServer.port = uLink.Network.player.port;
         uLink.MasterServer.RegisterHost("ShootField", "ShootField", "@pratap.", "Multiplayer", Application.loadedLevelName);

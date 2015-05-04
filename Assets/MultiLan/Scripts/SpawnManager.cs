@@ -38,8 +38,9 @@ public class SpawnManager : uLink.MonoBehaviour
         spawnPos.x += Random.Range(-radius, radius);
         spawnPos.z += Random.Range(-radius, radius);
 
-        currentInstance = uLink.Network.Instantiate(uLink.Network.player, playerPrefab, playerPrefab, playerPrefab, spawnPos, Quaternion.identity, 0, 100);
+        currentInstance = uLink.Network.Instantiate(uLink.Network.player, playerPrefab, playerPrefab, playerPrefab, spawnPos, Quaternion.identity, player.id, player.id, player.id);
         CameraFollow.Instance.target = currentInstance.transform;
+        currentInstance.GetComponent<CharacterSynchronizer>().characterID = player.id;
     }
 
     private void DestroySpawnData()
@@ -54,10 +55,5 @@ public class SpawnManager : uLink.MonoBehaviour
             GameObject tempGO = GameManager.Instance.proxyPlayerList[i];
             DestroyImmediate(tempGO);
         }
-    }
-	
-    void uLink_OnNetworkInstantiate(uLink.NetworkMessageInfo info) 
-    {
-        Debug.Log("New object instantiated by " + info.sender);
-    }
+    }	
 }

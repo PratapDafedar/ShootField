@@ -120,7 +120,8 @@ public class PlayerMoveController : MonoBehaviour
 
     void OnDestroy()
     {
-        DestroyImmediate(cursorObject.gameObject);
+        if (cursorObject)
+            DestroyImmediate(cursorObject.gameObject);
     }
 
     private bool  button8Down = false;

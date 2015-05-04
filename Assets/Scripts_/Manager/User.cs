@@ -158,14 +158,14 @@ public class User
 	}//SearchPlayer
 		
 	// Search a player from his id (return him as User object)
-	public static User SearchPlayerId(int id, List<User> userList) {
-		User searchUser = new User();
+	public static User SearchPlayerId(int id, List<User> userList) 
+    {
 		for(int i = 0; i < userList.Count; i++){
 			if(userList[i].id == id){
-				searchUser = userList[i];
+				return userList[i];
 			}
 		}	
-		return searchUser;
+		return null;
 	}//SearchPlayer
 		
 	// Check if a specific player is on the userList

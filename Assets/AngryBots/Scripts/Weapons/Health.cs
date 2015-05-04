@@ -132,11 +132,6 @@ public class Health : MonoBehaviour
             tempAngle.y = Random.Range (0.0f, 90.0f);
             scorchMark.transform.eulerAngles = tempAngle;
 		}
-
-        if (GameManager.Instance.cPlayer.isGameHost)
-        {
-            GameManager.Instance.CheckRoundFinish();
-        }
 	}
 }
 

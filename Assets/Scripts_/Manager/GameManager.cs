@@ -92,8 +92,7 @@ public class GameManager : MonoBehaviour
 
             if (isAllDeadBlue)
                 teamScoreRed ++;
-
-
+            
             RespawnAllPlayers ();
         }
     }
