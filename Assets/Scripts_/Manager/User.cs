@@ -87,60 +87,99 @@ public class User
 	}//parseUser
 		
 	// Transform a userList (List<User>) on a string
-	public static string ListToString(List<User> userList){
+	public static string TableToString(Dictionary<int, User> userList){
 		string values = "";
-		for(int i = 0; i < userList.Count; i++){
-			values+= userList[i].UserToString();
+
+        int i = 0;
+		foreach(int key in userList.Keys)
+        {
+			values+= userList[key].UserToString();
 			if(i < userList.Count-1){
 				values+="#";
-			}				
+			}
+            i++;
 		}
 		return values;
 	}//userList
+
+    public static string ListToString(List<User> userList)
+    {
+        string values = "";
+
+        int i = 0;
+        if (userList == null)
+            return "";
+
+        foreach (User user in userList)
+        {
+            values += user.UserToString();
+            if (i < userList.Count - 1)
+            {
+                values += "#";
+            }
+            i++;
+        }
+        return values;
+    }//userList
 		
 	// Create a userList (List<User>) from a string
-	public static List<User> ListToObject(string parseUser){
-		List<User> userList = new List<User>();
+	public static Dictionary<int, User> ListToObject(string parseUser)
+    {
+		Dictionary<int, User> userList = new Dictionary<int, User>();
 		string[] values = parseUser.Split('#');
-		for(int i = 0; i < values.Length; i++){
-			userList.Add(UserToObject(values[i]));
+		for(int i = 0; i < values.Length; i++)
+        {
+            User user = UserToObject(values[i]);
+			userList.Add(user.id, user);
 		}
 		return userList;
 	}//ListToObject
 		
 	// Remove a user from his M - Return the modified userList
-	public static List<User> RemoveFromId(List<User> userList, string gameId){
+	public static Dictionary<int, User> RemoveFromId(Dictionary<int, User> userList, string gameId){
 		User removeUser = null;
-		for(int i = 0; i < userList.Count; i++){
-			if(gameId == userList[i].gameId){					
-				removeUser = userList[i];
+
+        int id = 0;
+		foreach(int key in userList.Keys)
+        {
+			if(gameId == userList[key].gameId)
+            {					
+				removeUser = userList[key];
+                id = key;
 			}
-		}			
-		if(removeUser != null){
-			userList.Remove(removeUser);
+		}
+        if(removeUser != null){
+			userList.Remove(id);
 		}			
 		return userList;
 	}//RemoveFromId
 		
 	// Remove the server of the userList (call OnDisconnectedFromServer) - Return the modified userList
-	public static List<User> RemoveServer(List<User> userList){
-		User removeUser = null;
-		for(int i = 0; i < userList.Count; i++){
-			if(userList[i].isGameHost == true){
-				removeUser = userList[i];
+	public static Dictionary<int, User> RemoveServer(Dictionary<int, User> userList)
+    {
+		int removeUserId = -1;
+		foreach(int id in userList.Keys)
+        {
+			if(userList[id].isGameHost == true)
+            {
+				removeUserId = id;
 			}
 		}			
-		if(removeUser != null){
-			userList.Remove(removeUser);
+		if(removeUserId != -1)
+        {
+			userList.Remove(removeUserId);
 		}			
 		return userList;
 	}//RemoveServer
 				
 	// Save the new status of a player - Return the modified userList
-	public static List<User> SavePlayerStatus(string gameId, bool isPlayerInGame, List<User> userList) {
-		for(int i = 0; i < userList.Count; i++){
-			if(userList[i].gameId == gameId){
-				userList[i].isPlayerInGame = isPlayerInGame;
+	public static Dictionary<int, User> SavePlayerStatus(string gameId, bool isPlayerInGame, Dictionary<int, User> userList) 
+    {
+		foreach (int id in userList.Keys)
+        {
+			if(userList[id].gameId == gameId)
+            {
+				userList[id].isPlayerInGame = isPlayerInGame;
 			}
 		}	
 		return userList;
@@ -169,17 +208,20 @@ public class User
 	}//SearchPlayer
 		
 	// Check if a specific player is on the userList
-	public static bool inList(List<User> userList, string gameId){
-		for(int i = 0; i < userList.Count; i++){
-			if(userList[i].gameId == gameId){
+	public static bool inList(Dictionary<int, User> userList, string gameId)
+    {
+		foreach(int key in userList.Keys)
+        {
+			if(userList[key].gameId == gameId){
 				return true;
 			}
 		}	
 		return false;
 	}//userList	
 		
-	public static List<User> PingSort(List<User> userList){
-		return userList.OrderBy(x=>x.playerPing).ToList();	
+	public static List<User> PingSort(Dictionary<int, User> userList)
+    {
+		return userList.Values.ToList<User>().OrderBy(x=>x.playerPing).ToList();	
 	}//PingSort
 		
 	public static void PingPlayers(NetworkManager networkSrc){
@@ -187,13 +229,13 @@ public class User
 	}//PingPlayers
 		
 	public static string GetHostMessage(int key, NetworkManager networkSrc){
-		if(networkSrc.playerList[key].gameId == networkSrc.gameInfo.hostId){
+		if(networkSrc.playerTable[key].gameId == networkSrc.gameInfo.hostId){
 			return "[host]";
 		}
 		return "";
 	}//GetHostMessage
 		
 	public static string GetPlayerPing(int key, NetworkManager networkSrc){
-		return networkSrc.playerList[key].playerPing.ToString();			
+		return networkSrc.playerTable[key].playerPing.ToString();			
 	}//GetPlayerPing
 }

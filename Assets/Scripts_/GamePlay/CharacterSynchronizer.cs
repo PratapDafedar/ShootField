@@ -18,7 +18,7 @@ public class CharacterSynchronizer : uLink.MonoBehaviour
     {
         get
         {
-            return User.SearchPlayerId (characterID, NetworkManager.Instance.playerList);
+            return NetworkManager.Instance.playerTable[characterID];
         }
     }
 
@@ -97,7 +97,7 @@ public class CharacterSynchronizer : uLink.MonoBehaviour
 
             if (cachedHealth <= 0)
             {
-                    GameManager.Instance.CheckRoundFinish();
+                GameManager.Instance.CheckRoundFinish();
             }
         }
     }

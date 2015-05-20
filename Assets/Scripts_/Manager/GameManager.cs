@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
     {
         NetworkManager.Instance.networkView.RPC("RPC_RespawnAllPlayers", uLink.RPCMode.All, teamScoreBlue, teamScoreRed);
 
-        NetworkManager.Instance.networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(NetworkManager.Instance.playerList));
+        NetworkManager.Instance.networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.TableToString(NetworkManager.Instance.playerTable));
     }
 
     public void CheckRoundFinish()
@@ -102,9 +102,9 @@ public class GameManager : MonoBehaviour
         int deadCount = 0;
         int playerCount = 0;
 
-        for (int i = 0; i < NetworkManager.Instance.playerList.Count; i++)
+        foreach (int i in NetworkManager.Instance.playerTable.Keys)
         {
-            User tempPlayer = NetworkManager.Instance.playerList[i];
+            User tempPlayer = NetworkManager.Instance.playerTable[i];
             if (tempPlayer.cTeam == team)
             {
                 if (tempPlayer.health <= 0)

@@ -40,8 +40,8 @@ public class OnScreenLogger : MonoBehaviour {
 			streamingError += "\n" + logString + "\n >>> " + stackTrace;
 		}
 	}
-	bool cameraZoom;
-	void OnGUI ()
+
+    void OnGUI ()
 	{
 		isDebugging = GUI.Toggle (new Rect (0, Screen.height - 50, 100, 50), isDebugging, "Debug");
 

@@ -34,8 +34,7 @@ public class NetworkManager : uLink.MonoBehaviour
     public List<String> chatContent;
 
     // Playerlist
-    public List<User> playerList;
-    private List<User> playerMigrationList;
+    public Dictionary<int, User> playerTable;
 
     // Player exclusion
     public bool isExculdePlayer = false;
@@ -77,8 +76,7 @@ public class NetworkManager : uLink.MonoBehaviour
     public uLink.NetworkView networkView;
 
     private void InitNetworkManager()
-    {       
-
+    {
         gameInfo = new MGame();
     }
 
@@ -109,7 +107,7 @@ public class NetworkManager : uLink.MonoBehaviour
         _instance.InitNetworkManager();
 
         DontDestroyOnLoad(this);
-        playerList = new List<User>(); 
+        playerTable = new Dictionary<int, User>(); 
     }
 
     void Start()
@@ -148,17 +146,18 @@ public class NetworkManager : uLink.MonoBehaviour
             inGame = true;
         }
 
-        playerList.Clear(); // Clear the playerList 
+        playerTable.Clear(); // Clear the playerList 
         // Save the host on the playerList
-        playerList.Add(new User(GameManager.Instance.cPlayer.id,
-                        uLink.Network.player.externalEndpoint.ToString (),
-                        GameManager.Instance.cPlayer.cTeam,
-                        GameManager.Instance.cPlayer.privateIp,
-                        GameManager.Instance.cPlayer.publicIp,
-                        GameManager.Instance.cPlayer.name,
-                        0,
-                        inGame, 
-                        true));
+        playerTable.Add(GameManager.Instance.cPlayer.id,
+                        new User(GameManager.Instance.cPlayer.id,
+                                uLink.Network.player.externalEndpoint.ToString (),
+                                GameManager.Instance.cPlayer.cTeam,
+                                GameManager.Instance.cPlayer.privateIp,
+                                GameManager.Instance.cPlayer.publicIp,
+                                GameManager.Instance.cPlayer.name,
+                                0,
+                                inGame, 
+                                true));
         StartGame(false); // Try to start the game 
     }//OnServerInitialized	
 
@@ -214,14 +213,14 @@ public class NetworkManager : uLink.MonoBehaviour
     // OnPlayerDisconnected : call on the server
     void uLink_OnPlayerDisconnected(uLink.NetworkPlayer player)
     {
-        if (User.inList(playerList, player.ToString()))
+        if (User.inList(playerTable, player.ToString()))
         {
             gameInfo.totalPlayer--;
             networkView.RPC("RefreshPlayerCount", uLink.RPCMode.All, gameInfo.totalPlayer);
             
-            playerList = User.RemoveFromId(playerList, player.ToString());
-            playerList = User.PingSort(playerList);	// Sort the list by Ping
-            networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(playerList));
+            playerTable = User.RemoveFromId(playerTable, player.ToString());
+            List<User> players = User.PingSort(playerTable);	// Sort the list by Ping
+            networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(players));
             networkView.RPC("RemoveInPositionList", uLink.RPCMode.Others, int.Parse(player.ToString()));
         }
 
@@ -272,7 +271,7 @@ public class NetworkManager : uLink.MonoBehaviour
             // All the game will be rebuilt with a new host (if we find one)			
             gameInfo.totalPlayer = 0;// Put the total player on 0	
             CleanGame(); // Clean the game (remove all players prefab) (they will be re-loaded on the new host)				
-            playerList = User.RemoveServer(playerList);// Remove server from playerList (because he have leave the game)
+            playerTable = User.RemoveServer(playerTable);// Remove server from playerList (because he have leave the game)
             if (gameInfo.isOnDedicatedServer && !isPlayerExitGame)
             {
                 isDedicatedServerBreakDown = true;
@@ -314,9 +313,9 @@ public class NetworkManager : uLink.MonoBehaviour
             // Save the server new statut (in game)
             if (GameManager.Instance.cPlayer.isGameHost)
             {
-                playerList = User.SavePlayerStatus(GameManager.Instance.cPlayer.gameId, true, playerList);
+                playerTable = User.SavePlayerStatus(GameManager.Instance.cPlayer.gameId, true, playerTable);
                 // Send my new status to the clients
-                GetComponent<uLink.NetworkView>().RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(playerList));
+                GetComponent<uLink.NetworkView>().RPC("RefreshUserList", uLink.RPCMode.Others, User.TableToString(playerTable));
             }
             else
             {
@@ -416,15 +415,15 @@ public class NetworkManager : uLink.MonoBehaviour
 
     public void PingPlayers()
     {
-        if (playerList.Count > 1)
+        if (playerTable.Count > 1)
         { // If the list is not emtpy :			
             for (int i = 0; i < uLink.Network.connections.Length; i++)
             {
-                for (int j = 0; j < playerList.Count; j++)
+                foreach (int j in playerTable.Keys)
                 {
-                    if (uLink.Network.connections[i].ToString().Equals(playerList[j].gameId.ToString()))
+                    if (uLink.Network.connections[i].ToString().Equals(playerTable[j].gameId.ToString()))
                     {
-                        playerList[j].playerPing = uLink.Network.GetAveragePing(uLink.Network.connections[i]);
+                        playerTable[j].playerPing = uLink.Network.GetAveragePing(uLink.Network.connections[i]);
                     }
                 }
             }
@@ -613,12 +612,12 @@ public class NetworkManager : uLink.MonoBehaviour
                 inGame = true;
             }
             // Add the new player on the playerList
-            playerList.Add(new User(id, gameId, (User.Team)teamID, privateIp, publicIp, playerName, uLink.Network.GetAveragePing(player), inGame, false));
+            playerTable.Add(id, new User(id, gameId, (User.Team)teamID, privateIp, publicIp, playerName, uLink.Network.GetAveragePing(player), inGame, false));
             // Sort the list by Ping
-            playerList = User.PingSort(playerList);
+            List<User> users = User.PingSort(playerTable);
 
             // Refresh the lists of the clients : send on everybody except the server
-            networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(playerList));
+            networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(users));
 
             // Send the game informations to the new player
             networkView.RPC("GetGameInfos", player, gameInfo.GameToString(), true);
@@ -662,7 +661,7 @@ public class NetworkManager : uLink.MonoBehaviour
     [RPC]
     void RefreshUserList(string list)
     {
-        playerList = User.ListToObject(list);// Save the new list		
+        playerTable = User.ListToObject(list);// Save the new list		
     }//RefreshUserList
                 
     // Call by ther server to all clients when a player quit the game
@@ -770,9 +769,9 @@ public class NetworkManager : uLink.MonoBehaviour
     void RefreshPlayerStatus(string playerId, bool isPlayerInGame)
     {
         // Save the new status of the player
-        playerList = User.SavePlayerStatus(playerId, isPlayerInGame, playerList);
+        playerTable = User.SavePlayerStatus(playerId, isPlayerInGame, playerTable);
         // Call RefreshUserList on the other players
-        networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.ListToString(playerList));        
+        networkView.RPC("RefreshUserList", uLink.RPCMode.Others, User.TableToString(playerTable));        
     }//RefreshPlayerStatus
 
     // Call by a host to restart round.
@@ -782,9 +781,9 @@ public class NetworkManager : uLink.MonoBehaviour
         GameManager.Instance.teamScoreBlue = teamScoreBlue;
         GameManager.Instance.teamScoreRed = teamScoreRed;
 
-        for (int i = 0; i < NetworkManager.Instance.playerList.Count; i++)
+        foreach (int i in NetworkManager.Instance.playerTable.Keys)
         {
-            User tempPlayer = NetworkManager.Instance.playerList[i];
+            User tempPlayer = NetworkManager.Instance.playerTable[i];
             tempPlayer.health = 100;
         }
         GameManager.Instance.cPlayer.health = 100;

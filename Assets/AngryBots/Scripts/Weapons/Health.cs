@@ -43,8 +43,10 @@ public class Health : MonoBehaviour
 	    enabled = false;
 	    if (damagePrefab) 
         {
-		    if (damageEffectTransform == null)
-			    damageEffectTransform = transform;
+            if (damageEffectTransform == null)
+            {
+                damageEffectTransform = transform;
+            }
 		    GameObject effect = Spawner.Spawn (damagePrefab, Vector3.zero, Quaternion.identity);
 		    effect.transform.parent = damageEffectTransform;
 		    effect.transform.localPosition = Vector3.zero;
@@ -53,8 +55,8 @@ public class Health : MonoBehaviour
                                             GetComponent<Collider>().bounds.extents.z);
 		    colliderRadiusHeuristic = tempSize.magnitude * 0.5f;
 		    damageEffectCenterYOffset = GetComponent<Collider>().bounds.extents.y;
-
 	    }
+
 	    if (scorchMarkPrefab) {
 		    scorchMark = GameObject.Instantiate(scorchMarkPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 		    scorchMark.SetActive (false);

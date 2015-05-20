@@ -96,7 +96,8 @@ public class MWaitRoom : uLink.MonoBehaviour {
 		
 	}//OnGUI
 	
-	private void DisplayPlayerList(){
+	private void DisplayPlayerList()
+    {
 		GUI.BeginGroup(playerListRec, "");
 		GUI.Box(new Rect(0, 0, playerListSizeX, playerListSizeY), text.wrPlayerListTitle);
 		float sizeY = text.margin*3;
@@ -104,19 +105,20 @@ public class MWaitRoom : uLink.MonoBehaviour {
         {
             NetworkManager.Instance.PingPlayers();
 		}
-        playerScroll = GUI.BeginScrollView(new Rect(0, sizeY, playerListSizeX, playerListSizeY - text.margin * 4), playerScroll, new Rect(0, 0, playerListSizeX - text.margin * 2, (NetworkManager.Instance.playerList.Count * (playerListBoxSizeY + text.margin / 2)) - text.margin / 2));
+        playerScroll = GUI.BeginScrollView(new Rect(0, sizeY, playerListSizeX, playerListSizeY - text.margin * 4), playerScroll, new Rect(0, 0, playerListSizeX - text.margin * 2, (NetworkManager.Instance.playerTable.Count * (playerListBoxSizeY + text.margin / 2)) - text.margin / 2));
 		sizeY=0;
 
 		// Display the player list
         GUI.Box(new Rect(text.margin, sizeY, playerListSizeX - text.margin * 3, playerListBoxSizeY), "TEAM - BLUE");
         sizeY += playerListBoxSizeY + text.margin / 2;
 
-        for (int i = 0; i < NetworkManager.Instance.playerList.Count; i++)
+        int j = 0;
+        foreach (int i in NetworkManager.Instance.playerTable.Keys)
         {
-            if (NetworkManager.Instance.playerList[i].cTeam == User.Team.BLUE)
+            if (NetworkManager.Instance.playerTable[i].cTeam == User.Team.BLUE)
             {
                 string serverMessage = "";
-                if (NetworkManager.Instance.playerList[i].isGameHost == true)
+                if (NetworkManager.Instance.playerTable[i].isGameHost == true)
                 {
                     serverMessage = text.wrPlayerListHostTxt;
                 }
@@ -125,7 +127,7 @@ public class MWaitRoom : uLink.MonoBehaviour {
                     serverMessage = text.wrPlayerListClientTxt;
                 }
                 string playerStatus = "";
-                if (NetworkManager.Instance.playerList[i].isPlayerInGame == true)
+                if (NetworkManager.Instance.playerTable[i].isPlayerInGame == true)
                 {
                     playerStatus = text.wrPlayerListStatutGameTxt;
                 }
@@ -135,20 +137,20 @@ public class MWaitRoom : uLink.MonoBehaviour {
                 }
                 string pingText = "";
                 // If the current ID is the host's ID : I ping the host (and if I have not been excuded of the game)
-                if (NetworkManager.Instance.playerList[i].isGameHost == true && !GameManager.Instance.cPlayer.isGameHost && !NetworkManager.Instance.isPlayerExculde)
+                if (NetworkManager.Instance.playerTable[i].isGameHost == true && !GameManager.Instance.cPlayer.isGameHost && !NetworkManager.Instance.isPlayerExculde)
                 {
-                    pingText = uLink.Network.GetAveragePing(uLink.Network.connections[i]).ToString();
+                    pingText = uLink.Network.GetAveragePing(uLink.Network.connections[j]).ToString();
                     // ELse (if it's a simple player) : display the ping wich have been done by the host
                 }
                 else
                 {
-                    pingText = NetworkManager.Instance.playerList[i].playerPing.ToString();
+                    pingText = NetworkManager.Instance.playerTable[i].playerPing.ToString();
                 }
                 GUI.Box(new Rect(text.margin, sizeY, playerListSizeX - text.margin * 3, playerListBoxSizeY), "");
-                GUI.Label(new Rect(text.margin * 2, sizeY + text.margin / 2, playerListSizeX, playerListBoxSizeY - 4), NetworkManager.Instance.playerList[i].name + " " + serverMessage + ": " + playerStatus + " " + pingText + " ms ");
+                GUI.Label(new Rect(text.margin * 2, sizeY + text.margin / 2, playerListSizeX, playerListBoxSizeY - 4), NetworkManager.Instance.playerTable[i].name + " " + serverMessage + ": " + playerStatus + " " + pingText + " ms ");
                 float buttonSizeX = playerListSizeX - buttonExculdeSizeX - text.margin * 2.5f;
             }
-						
+            j++;		
 #if false
 			if(networkSrc.isGameHost && networkSrc.playerList[i].gameId != networkSrc.playerDataSrc.gameId){
 				if(GUI.Button(new Rect(buttonSizeX, sizeY+text.margin/2, buttonExculdeSizeX,buttonExculdeSizeY), "X")){
@@ -161,12 +163,14 @@ public class MWaitRoom : uLink.MonoBehaviour {
 
         GUI.Box(new Rect(text.margin, sizeY, playerListSizeX - text.margin * 3, playerListBoxSizeY), "TEAM - RED");
         sizeY += playerListBoxSizeY + text.margin / 2;
-        for (int i = 0; i < NetworkManager.Instance.playerList.Count; i++)
+
+        int k = 0;
+        foreach (int i in NetworkManager.Instance.playerTable.Keys)
         {
-            if (NetworkManager.Instance.playerList[i].cTeam == User.Team.RED)
+            if (NetworkManager.Instance.playerTable[i].cTeam == User.Team.RED)
             {
                 string serverMessage = "";
-                if (NetworkManager.Instance.playerList[i].isGameHost == true)
+                if (NetworkManager.Instance.playerTable[i].isGameHost == true)
                 {
                     serverMessage = text.wrPlayerListHostTxt;
                 }
@@ -175,7 +179,7 @@ public class MWaitRoom : uLink.MonoBehaviour {
                     serverMessage = text.wrPlayerListClientTxt;
                 }
                 string playerStatus = "";
-                if (NetworkManager.Instance.playerList[i].isPlayerInGame == true)
+                if (NetworkManager.Instance.playerTable[i].isPlayerInGame == true)
                 {
                     playerStatus = text.wrPlayerListStatutGameTxt;
                 }
@@ -185,21 +189,22 @@ public class MWaitRoom : uLink.MonoBehaviour {
                 }
                 string pingText = "";
                 // If the current ID is the host's ID : I ping the host (and if I have not been excuded of the game)
-                if (NetworkManager.Instance.playerList[i].isGameHost == true && !GameManager.Instance.cPlayer.isGameHost && !NetworkManager.Instance.isPlayerExculde)
+                if (NetworkManager.Instance.playerTable[i].isGameHost == true && !GameManager.Instance.cPlayer.isGameHost && !NetworkManager.Instance.isPlayerExculde)
                 {
-                    pingText = uLink.Network.GetAveragePing(uLink.Network.connections[i]).ToString();
+                    pingText = uLink.Network.GetAveragePing(uLink.Network.connections[k]).ToString();
                     // ELse (if it's a simple player) : display the ping wich have been done by the host
                 }
                 else
                 {
-                    pingText = NetworkManager.Instance.playerList[i].playerPing.ToString();
+                    pingText = NetworkManager.Instance.playerTable[i].playerPing.ToString();
                 }
                 GUI.Box(new Rect(text.margin, sizeY, playerListSizeX - text.margin * 3, playerListBoxSizeY), "");
-                GUI.Label(new Rect(text.margin * 2, sizeY + text.margin / 2, playerListSizeX, playerListBoxSizeY - 4), NetworkManager.Instance.playerList[i].name + " " + serverMessage + ": " + playerStatus + " " + pingText + " ms ");
+                GUI.Label(new Rect(text.margin * 2, sizeY + text.margin / 2, playerListSizeX, playerListBoxSizeY - 4), NetworkManager.Instance.playerTable[i].name + " " + serverMessage + ": " + playerStatus + " " + pingText + " ms ");
                 float buttonSizeX = playerListSizeX - buttonExculdeSizeX - text.margin * 2.5f;
 
                 sizeY += playerListBoxSizeY + text.margin / 2;
             }
+            j++;
         }
 		GUI.EndScrollView();		
 		GUI.EndGroup();
