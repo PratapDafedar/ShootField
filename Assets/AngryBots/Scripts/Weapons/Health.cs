@@ -5,16 +5,16 @@ using System.Collections;
 public class Health : MonoBehaviour
 {
     public float maxHealth = 100.0f;
-    public float cHealth 
-    {
-        get {
-            return charSynch.cUser.health;
-        }
-        set {
-            charSynch.cUser.health = value;
-            charSynch.cachedHealth = value;
-        }
-    }
+    public float cHealth;
+    //{
+    //    get {
+    //        return charSynch.cUser.health;
+    //    }
+    //    set {
+    //        charSynch.cUser.health = value;
+    //        charSynch.cachedHealth = value;
+    //    }
+    //}
 
     public float regenerateSpeed = 0.0f;
     public bool invincible = false;
@@ -36,7 +36,7 @@ public class Health : MonoBehaviour
     private float damageEffectCenterYOffset;
 
     private float colliderRadiusHeuristic = 1.0f;
-    private CharacterSynchronizer charSynch;
+    //private CharacterSynchronizer charSynch;
 
     void Awake()
     {
@@ -61,7 +61,7 @@ public class Health : MonoBehaviour
 		    scorchMark = GameObject.Instantiate(scorchMarkPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 		    scorchMark.SetActive (false);
 	    }
-        charSynch = GetComponent<CharacterSynchronizer>();
+        //charSynch = GetComponent<CharacterSynchronizer>();
     }
 
     public void OnDamage(float amount, Vector3 fromDirection)
