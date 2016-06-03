@@ -332,7 +332,7 @@ public class PlayerMoveController : MonoBehaviour
 	    // Set the position of the cursor object
 	    cursorObject.position = cursorWorldPosition;
 	
-	    #if !UNITY_FLASH
+		#if !UNITY_EDITOR
 		    // Hide mouse cursor when within screen area, since we're showing game cursor instead
 		    Cursor.visible = (Input.mousePosition.x < 0 || Input.mousePosition.x > Screen.width || Input.mousePosition.y < 0 || Input.mousePosition.y > Screen.height);
 	    #endif

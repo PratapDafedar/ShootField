@@ -35,4 +35,14 @@ public class GameManager : MonoBehaviour
 	{
 		SceneManager.LoadScene ("Login");
 	}
+
+	public void LoadLobbyScreen()
+	{
+		SceneManager.LoadScene ("Lobby");
+	}
+
+	public void LoadGamePlayScreen()
+	{
+		SceneManager.LoadScene ("Maze");
+	}
 }

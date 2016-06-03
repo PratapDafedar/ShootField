@@ -46,29 +46,44 @@ public class LocalNetworkDiscovery : MonoBehaviour
 		InvokeRepeating ("RefreshServer", 0, 5);
 	}
 
+	void Start ()
+	{
+		PortNumber = networkDiscovery.broadcastPort;
+		NetworkManagerEventHandler.OnClientConnectAction = OnClientConnect;
+		NetworkManagerEventHandler.OnServerConnectAction = OnServerConnect;
+	}
+
 	public void RefreshServer ()
 	{
-		broadCastResult = networkDiscovery.broadcastsReceived;
-		findServerUIController.CreateServerList (broadCastResult);
+		if (findServerUIController != null) 
+		{
+			broadCastResult = networkDiscovery.broadcastsReceived;
+			findServerUIController.CreateServerList (broadCastResult);
+		} 
+		else {
+			CancelInvoke ("RefreshServer");
+		}
 	}
 	
 	public void StartAsServer (int port)
 	{
 		PortNumber = port;
-		if (!networkDiscovery.isServer) 
+		if (!networkDiscovery.isServer)
 		{
 			if (networkDiscovery.running)
 				networkDiscovery.StopBroadcast ();
 			networkDiscovery.Initialize ();
 			networkDiscovery.StartAsServer ();
 
+			NetworkManager.singleton.networkAddress = "127.0.0.1";
+			//NetworkManager.singleton.networkPort = m_portNumber;
 			NetworkManager.singleton.StartHost();
 		}
 	}
 
 	public void StartAsClient ()
 	{
-		if (!networkDiscovery.isClient) 
+		if (!networkDiscovery.isClient)
 		{
 			if (networkDiscovery.running)
 				networkDiscovery.StopBroadcast ();
@@ -82,12 +97,21 @@ public class LocalNetworkDiscovery : MonoBehaviour
 	public void ConnectToServer (string ip)
 	{
 		NetworkManager.singleton.networkAddress = ip;
-		NetworkManager.singleton.networkPort = m_portNumber;
 		NetworkManager.singleton.StartClient();
 	}
 
-	public void OnSuccessfulConnect (NetworkMessage netMsg)
+	public void OnClientConnect (NetworkConnection conn)
 	{
-		Debug.Log("Connected to server");
+		GameManager.Instance.LoadLobbyScreen ();
+	}
+
+	public void OnServerConnect (NetworkConnection conn)
+	{
+		GameManager.Instance.LoadLobbyScreen ();
+	}
+
+	void OnDestroy ()
+	{
+		CancelInvoke ();
 	}
 }

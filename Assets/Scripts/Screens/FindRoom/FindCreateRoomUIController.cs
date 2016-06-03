@@ -83,7 +83,7 @@ public class FindCreateRoomUIController : MonoBehaviour
 			cloneCell.gameObject.SetActive (true);
 			cloneCell.transform.SetParent (infoCellPrefab.transform.parent, false);
 			ServerInfoCell infoCell = cloneCell.GetComponent<ServerInfoCell> ();
-			infoCell.Init (infoText, result.serverAddress);
+			infoCell.Init (infoText, infoText);
 		}
 	}
 }
