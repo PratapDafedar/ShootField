@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 			Instance = this;
 			DontDestroyOnLoad (this);
 		} else {
-			Destroy (this);
+			Destroy (this.gameObject);
 		}
 	}
 
@@ -29,5 +29,10 @@ public class GameManager : MonoBehaviour
 	public void LoadFindRoomScreen()
 	{
 		SceneManager.LoadScene ("FindRoom");
+	}
+
+	public void LoadLoginScreen()
+	{
+		SceneManager.LoadScene ("Login");
 	}
 }
