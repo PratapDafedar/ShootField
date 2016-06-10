@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class LobbyScreenController : MonoBehaviour 
 {
+	public GameObject team;
 	public GameObject indiviualPlayerData;
 	public GameObject indiviualPlayerBlueTeamParent;
 	public GameObject indiviualPlayerRedTeamParent;
@@ -16,6 +17,11 @@ public class LobbyScreenController : MonoBehaviour
 	private List<GameObject> playerList;
 
 	void Start()
+	{
+		Init ();
+	}
+
+	void Init()
 	{
 		playerList = new List<GameObject> ();
 		ListOfPlayerInTeam ();
