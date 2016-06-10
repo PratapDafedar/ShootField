@@ -28,9 +28,9 @@ public class OnScreenLogger : MonoBehaviour {
 
 	void HandleLog(string logString, string stackTrace, LogType type)
 	{
-		if (type == LogType.Error ||
-		    type == LogType.Exception ||
-            type == LogType.Warning )
+//		if (type == LogType.Error ||
+//		    type == LogType.Exception ||
+//            type == LogType.Warning )
 		{
 			streamingError += "\n" + logString + "\n >>> " + stackTrace;
 		}

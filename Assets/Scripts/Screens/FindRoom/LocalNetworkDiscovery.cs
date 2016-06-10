@@ -49,8 +49,10 @@ public class LocalNetworkDiscovery : MonoBehaviour
 	void Start ()
 	{
 		PortNumber = networkDiscovery.broadcastPort;
-		NetworkManagerEventHandler.OnClientConnectAction = OnClientConnect;
-		NetworkManagerEventHandler.OnServerConnectAction = OnServerConnect;
+		NetworkEventManager.OnClientConnectAction = OnClientConnect;
+		NetworkEventManager.OnServerConnectAction = OnServerConnect;
+		NetworkEventManager.OnClientDisconnectAction = OnClientDisconnect;
+		NetworkEventManager.OnServerDisconnectAction = OnServerDisConnect;
 	}
 
 	public void RefreshServer ()
@@ -108,6 +110,16 @@ public class LocalNetworkDiscovery : MonoBehaviour
 	public void OnServerConnect (NetworkConnection conn)
 	{
 		GameManager.Instance.LoadLobbyScreen ();
+	}
+
+	public void OnClientDisconnect (NetworkConnection conn)
+	{
+		GameManager.Instance.LoadFindRoomScreen ();
+	}
+
+	public void OnServerDisConnect (NetworkConnection conn)
+	{
+		GameManager.Instance.LoadFindRoomScreen ();
 	}
 
 	void OnDestroy ()
