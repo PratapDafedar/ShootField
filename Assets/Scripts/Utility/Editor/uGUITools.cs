@@ -55,6 +55,14 @@ public class uGUITools : MonoBehaviour
 		}
 	}
 
+	[MenuItem ("Tools/DeleteEmptyFolders")]
+	public static void DeleteEmptyFolders ()
+	{
+		DirectoryInfo dirInfo = new DirectoryInfo( Application.dataPath + "/");
+		SearchForEmptyFolder (dirInfo);
+		AssetDatabase.Refresh ();
+	}
+
 	[MenuItem("Tools/Editor/CreateMaterial")]
 	public static void CreateAssetBunldes ()
 	{
@@ -67,6 +75,37 @@ public class uGUITools : MonoBehaviour
             var material = new Material (Shader.Find("Unlit With Shadows"));
             material.mainTexture = AssetDatabase.LoadAssetAtPath<Texture>(path);
             AssetDatabase.CreateAsset(material, materialPath);
+		}
+	}
+	
+	//********** Private methods **********//
+	
+	/// <summary>
+	/// Search for an empty folder and deletes it.
+	/// </summary>
+	/// <param name="dirInfo">Dir info.</param>
+	static void SearchForEmptyFolder (DirectoryInfo dirInfo)
+	{
+		DirectoryInfo[] dirInfos = dirInfo.GetDirectories("*.*");
+		if (dirInfos.Length != 0)
+		{
+			foreach (DirectoryInfo tempDirInfo in dirInfos) 
+			{
+				SearchForEmptyFolder (tempDirInfo);
+			}
+		}
+		
+		AssetDatabase.Refresh ();
+		
+		if (dirInfo.GetDirectories("*.*").Length == 0)
+		{
+			if (dirInfo.GetFiles("*.*").Length == 0)
+			{
+				UnityEditor.FileUtil.DeleteFileOrDirectory (dirInfo.FullName);
+				bool result = UnityEditor.FileUtil.DeleteFileOrDirectory (dirInfo.FullName + ".meta");
+				Debug.Log (result + "Deleted Dir : " + dirInfo.FullName);
+				return;
+			}
 		}
 	}
 }

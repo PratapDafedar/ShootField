@@ -23,7 +23,7 @@ public class OnScreenLogger : MonoBehaviour {
 	
 	void Start ()
 	{
-		Application.RegisterLogCallback (HandleLog);
+		Application.logMessageReceived += HandleLog;
 	}
 
 	void HandleLog(string logString, string stackTrace, LogType type)
@@ -43,16 +43,20 @@ public class OnScreenLogger : MonoBehaviour {
 	
 	void OnGUI ()
 	{
-		isDebugging = GUI.Toggle (new Rect (250, Screen.height - 25, 100, 25), isDebugging, "Debug");
+		isDebugging = GUI.Toggle (new Rect (Screen.width * 0.4f, Screen.height - 25, 100, 25), isDebugging, "Debug");
 
 		if (! isDebugging)
 			return;
 
-		GUILayout.BeginArea (new Rect  (10, 10, 400, 300));
-		scrollPosition = GUILayout.BeginScrollView (scrollPosition, GUILayout.Width (400), GUILayout.Height (300));
+		GUILayout.BeginArea (new Rect  (10, 10, Screen.width / 2f, Screen.height * 0.8f));
+		scrollPosition = GUILayout.BeginScrollView (scrollPosition, GUILayout.Width (Screen.width / 2f), GUILayout.Height (Screen.height * 0.8f));
 		GUILayout.TextField ("\nLogs\n : " + streamingError, "Label");
 		GUILayout.EndScrollView ();
 		GUILayout.EndArea ();
+
+		if (GUI.Button (new Rect (Screen.width * 0.6f, Screen.height - 50, 80, 40), "clear")) {
+			streamingError = "";
+		}
 	}
 
 }
