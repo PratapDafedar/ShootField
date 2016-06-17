@@ -37,9 +37,9 @@ public class Login : MonoBehaviour
 			Player player = new Player (name, team);
 
 			GameManager.Instance.cPlayer = player;
-			GameManager.Instance.LoadFindRoomScreen ();
+			SceneManager.Instance.LoadFindRoomScreen ();
 
-			PlayerPrefs.SetString ("PLAYER_NAME", player.name);
+			PlayerPrefs.SetString ("PLAYER_NAME", player._name);
 			PlayerPrefs.SetInt ("TEAM_IS_BLUE", teamBlue.isOn ? 1 : 0);
 		} else {
 			invalidNameText.gameObject.SetActive (true);

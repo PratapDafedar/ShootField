@@ -39,14 +39,18 @@ public class LobbyScreenController : MonoBehaviour
 	{
 		if (NetworkManager.singleton != null) 
 		{
-			NetworkManager.singleton.StopHost ();
+			if (GameManager.playerType == GameManager.PlayerType.Master) {
+				NetworkManager.singleton.StopHost ();
+			} else if (GameManager.playerType == GameManager.PlayerType.Client) {
+				NetworkManager.singleton.client.Disconnect();
+			}
 		}
-		GameManager.Instance.LoadFindRoomScreen ();
+		SceneManager.Instance.LoadFindRoomScreen ();
 	}
 
 	public void OnPlayButtonPressed ()
 	{
-		GameManager.Instance.LoadGamePlayScreen ();
+		SceneManager.Instance.LoadGamePlayScreen ();
 	}
 
 	public void ClearIndividualPlayerList(int i)

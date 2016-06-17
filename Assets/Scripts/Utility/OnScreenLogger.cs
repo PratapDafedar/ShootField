@@ -32,7 +32,7 @@ public class OnScreenLogger : MonoBehaviour {
 //		    type == LogType.Exception ||
 //            type == LogType.Warning )
 		{
-			streamingError += "\n" + logString + "\n >>> " + stackTrace;
+			streamingError += "\n" + logString;// + "\n >>> " + stackTrace;
 		}
 
         if (streamingError.Length > 10000)

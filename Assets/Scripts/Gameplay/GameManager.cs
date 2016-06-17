@@ -1,15 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour 
 {
 	public const string IP_ADDRESS = "127.0.0.1";
 	public const int PORT_NUM = 8888;
+	public const float COUNTDOWN_TIME = 5;
+	private const string PLAYER_ID_PREFIX = "Player ";
 
 	public static GameManager Instance;
-
 	public Player cPlayer;
+
+	private static Dictionary<string, SoldierController> playerDict;
+
+	public enum PlayerType
+	{
+		None = -1,
+		Master,
+		Client,
+	}
+	public static PlayerType playerType;
 
 	void Awake ()
 	{
@@ -23,26 +34,41 @@ public class GameManager : MonoBehaviour
 
 	void Start () 
 	{
-	
+		playerDict = new Dictionary<string, SoldierController> ();
 	}
 	
-	public void LoadFindRoomScreen()
+	#region Player tracking
+
+	public static void RegisterPlayer (string _netID, SoldierController _player)
 	{
-		SceneManager.LoadScene ("FindRoom");
+		string _playerID = PLAYER_ID_PREFIX + _netID;
+		playerDict.Add(_playerID, _player);
+		_player.transform.name = _playerID;
 	}
 
-	public void LoadLoginScreen()
+	public static void UnRegisterPlayer (string _playerID)
 	{
-		SceneManager.LoadScene ("Login");
+		playerDict.Remove(_playerID);
 	}
 
-	public void LoadLobbyScreen()
+	public static SoldierController GetPlayer (string _playerID)
 	{
-		SceneManager.LoadScene ("Lobby");
+		return playerDict[_playerID];
 	}
 
-	public void LoadGamePlayScreen()
+	void OnGUI ()
 	{
-		SceneManager.LoadScene ("Maze");
+		GUILayout.BeginArea(new Rect(200, 200, 200, 500));
+		GUILayout.BeginVertical();
+
+		foreach (string _playerID in playerDict.Keys)
+		{
+			GUILayout.Label(_playerID + "  -  " + playerDict[_playerID].transform.name);
+		}
+
+		GUILayout.EndVertical();
+		GUILayout.EndArea();
 	}
+
+	#endregion
 }

@@ -21,11 +21,12 @@ public class FindCreateRoomUIController : MonoBehaviour
 	void Start ()
 	{
 		LocalNetworkDiscovery.Instance.StartAsClient ();
+		portField.text = LocalNetworkDiscovery.Instance.PortNumber.ToString ();
 	}
 
 	public void OnBackButtonTapped ()
 	{
-		GameManager.Instance.LoadLoginScreen ();
+		SceneManager.Instance.LoadLoginScreen ();
 	}
 
 	public void OnSelectFindServerTab ()

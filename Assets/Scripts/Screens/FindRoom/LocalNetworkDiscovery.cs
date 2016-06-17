@@ -31,7 +31,7 @@ public class LocalNetworkDiscovery : MonoBehaviour
 			Instance = this;
 		} 
 		else {
-			Destroy (Instance);
+			Destroy (this.gameObject);
 			return;
 		}
 
@@ -48,11 +48,15 @@ public class LocalNetworkDiscovery : MonoBehaviour
 
 	void Start ()
 	{
-		PortNumber = networkDiscovery.broadcastPort;
-		NetworkEventManager.OnClientConnectAction = OnClientConnect;
-		NetworkEventManager.OnServerConnectAction = OnServerConnect;
-		NetworkEventManager.OnClientDisconnectAction = OnClientDisconnect;
-		NetworkEventManager.OnServerDisconnectAction = OnServerDisConnect;
+		if (networkDiscovery != null) {
+			PortNumber = networkDiscovery.broadcastPort;
+		}
+		MultiplayerLobbyManager.OnClientConnectAction = OnClientConnect;
+		MultiplayerLobbyManager.OnServerConnectAction = OnServerConnect;
+		MultiplayerLobbyManager.OnClientDisconnectAction = OnClientDisconnect;
+		MultiplayerLobbyManager.OnServerDisconnectAction = OnServerDisConnect;
+
+		GameManager.playerType = GameManager.PlayerType.None;
 	}
 
 	public void RefreshServer ()
@@ -74,17 +78,23 @@ public class LocalNetworkDiscovery : MonoBehaviour
 		{
 			if (networkDiscovery.running)
 				networkDiscovery.StopBroadcast ();
-			networkDiscovery.Initialize ();
-			networkDiscovery.StartAsServer ();
+//			networkDiscovery.Initialize ();
+//			networkDiscovery.StartAsServer ();
 
-			NetworkManager.singleton.networkAddress = "127.0.0.1";
+//			NetworkManager.singleton.networkAddress = "127.0.0.1";
 			//NetworkManager.singleton.networkPort = m_portNumber;
-			NetworkManager.singleton.StartHost();
+//			MultiplayerLobbyManager.singleton.StartHost();
+
+			//MultiplayerLobbyManager.Instance.networkPort = PortNumber;
+			MultiplayerLobbyManager.Instance.CreateServer();
+			GameManager.playerType = GameManager.PlayerType.Master;
 		}
 	}
 
 	public void StartAsClient ()
 	{
+		if (this == null)
+			return;
 		if (!networkDiscovery.isClient)
 		{
 			if (networkDiscovery.running)
@@ -98,28 +108,33 @@ public class LocalNetworkDiscovery : MonoBehaviour
 
 	public void ConnectToServer (string ip)
 	{
-		NetworkManager.singleton.networkAddress = ip;
-		NetworkManager.singleton.StartClient();
+		networkDiscovery.StopBroadcast ();
+		MultiplayerLobbyManager.Instance.JoinServer(ip, PortNumber);
+		GameManager.playerType = GameManager.PlayerType.Client;
 	}
 
 	public void OnClientConnect (NetworkConnection conn)
 	{
-		GameManager.Instance.LoadLobbyScreen ();
+		if (!NetworkServer.active) {
+			SceneManager.Instance.LoadLobbyScreen ();
+			MultiplayerLobbyManager.Instance.TryToAddPlayer ();
+		}
 	}
 
 	public void OnServerConnect (NetworkConnection conn)
 	{
-		GameManager.Instance.LoadLobbyScreen ();
+		
 	}
 
 	public void OnClientDisconnect (NetworkConnection conn)
 	{
-		GameManager.Instance.LoadFindRoomScreen ();
+		//Erase client related info here.
+
 	}
 
 	public void OnServerDisConnect (NetworkConnection conn)
-	{
-		GameManager.Instance.LoadFindRoomScreen ();
+	{		
+		SceneManager.Instance.LoadFindRoomScreen ();
 	}
 
 	void OnDestroy ()
