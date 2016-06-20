@@ -4,18 +4,29 @@ using UnityEngine.Networking;
 using System.Collections.Generic;
 using System.Collections;
 
-public class FindCreateRoomUIController : MonoBehaviour 
+public class RoomUIController : MonoBehaviour 
 {	
+	public static RoomUIController Instance;
+
 	public RectTransform findServerPanel;
 	public RectTransform createServerPanel;
+	public RectTransform lobbyServerPanel;
 
 	public InputField portField;
 
 	public ServerInfoCell infoCellPrefab;
 
+	public enum State
+	{
+		FindRoom,
+		CreateRoom,
+		Lobby,
+	}
+	public State curState;
+
 	void Awake()
 	{
-		
+		Instance = this;	
 	}
 
 	void Start ()
@@ -85,6 +96,31 @@ public class FindCreateRoomUIController : MonoBehaviour
 			cloneCell.transform.SetParent (infoCellPrefab.transform.parent, false);
 			ServerInfoCell infoCell = cloneCell.GetComponent<ServerInfoCell> ();
 			infoCell.Init (infoText, infoText);
+		}
+	}
+
+	public void UpdatePanelState (State screenType)
+	{
+		findServerPanel.gameObject.SetActive (screenType == State.FindRoom);
+		createServerPanel.gameObject.SetActive (screenType == State.CreateRoom);
+		lobbyServerPanel.gameObject.SetActive (screenType == State.Lobby);
+		switch (screenType)
+		{
+		case State.CreateRoom:
+
+			break;
+		case State.FindRoom:
+
+
+
+
+			break;
+		case State.Lobby:
+
+
+
+
+			break;
 		}
 	}
 }

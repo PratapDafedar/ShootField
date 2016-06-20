@@ -24,11 +24,6 @@ public class SceneManager : MonoBehaviour
 		LoadScene ("01.Login");
 	}
 
-	public void LoadLobbyScreen()
-	{
-		//LoadScene ("03.Lobby");
-	}
-
 	public void LoadGamePlayScreen()
 	{
 		LoadScene ("1.Maze");
@@ -37,6 +32,11 @@ public class SceneManager : MonoBehaviour
 	public void LoadScene (string scene)
 	{
 		UnityEngine.SceneManagement.SceneManager.LoadScene (scene);
+	}
+
+	public static AsyncOperation LoadSceneAsync(string newSceneName)
+	{
+		return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync (newSceneName);
 	}
 
 	public static UnityEngine.SceneManagement.Scene GetSceneAt (int index)

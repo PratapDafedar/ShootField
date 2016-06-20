@@ -4,6 +4,7 @@ using UnityEngine.Networking;
 using UnityEngine.Networking.Match;
 using System.Collections;
 
+[RequireComponent(typeof(NetworkManager))]
 public class MultiplayerLobbyManager : NetworkLobbyManager 
 {
 	public static MultiplayerLobbyManager Instance;
@@ -43,12 +44,11 @@ public class MultiplayerLobbyManager : NetworkLobbyManager
 	public override void OnStartHost()
 	{
 		base.OnStartHost();
-		SceneManager.Instance.LoadLobbyScreen ();
+		RoomUIController.Instance.UpdatePanelState (RoomUIController.State.Lobby);
 	}
 
 	public void OnDestroyMatch(BasicResponse extendedInfo)
 	{
-		StopMatchMaker();
 		StopHost();
 		SceneManager.Instance.LoadFindRoomScreen ();
 	}
@@ -59,6 +59,7 @@ public class MultiplayerLobbyManager : NetworkLobbyManager
 	//But OnLobbyClientConnect isn't called on hosting player. So we override the lobbyPlayer creation
 	public override GameObject OnLobbyServerCreateLobbyPlayer (NetworkConnection conn, short playerControllerId)
 	{
+		Debug.LogError ("OnLobbyServerCreateLobbyPlayer");
 		GameObject obj = Instantiate(lobbyPlayerPrefab.gameObject) as GameObject;
 
 		Player newPlayer = obj.GetComponent<Player>();

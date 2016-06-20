@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scene/02.FindRoom.unity
+    path: Assets/Scene/02.Lobby.unity
   - enabled: 1
     path: Assets/Scene/03.Lobby.unity
   - enabled: 1

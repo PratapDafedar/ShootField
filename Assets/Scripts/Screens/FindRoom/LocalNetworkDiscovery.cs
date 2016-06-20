@@ -20,7 +20,7 @@ public class LocalNetworkDiscovery : MonoBehaviour
 		}
 	}
 
-	public FindCreateRoomUIController findServerUIController;
+	public RoomUIController findServerUIController;
 
 	private NetworkDiscovery networkDiscovery;
 	private Dictionary <string, NetworkBroadcastResult> broadCastResult;
@@ -78,14 +78,7 @@ public class LocalNetworkDiscovery : MonoBehaviour
 		{
 			if (networkDiscovery.running)
 				networkDiscovery.StopBroadcast ();
-//			networkDiscovery.Initialize ();
-//			networkDiscovery.StartAsServer ();
 
-//			NetworkManager.singleton.networkAddress = "127.0.0.1";
-			//NetworkManager.singleton.networkPort = m_portNumber;
-//			MultiplayerLobbyManager.singleton.StartHost();
-
-			//MultiplayerLobbyManager.Instance.networkPort = PortNumber;
 			MultiplayerLobbyManager.Instance.CreateServer();
 			GameManager.playerType = GameManager.PlayerType.Master;
 		}
@@ -116,7 +109,8 @@ public class LocalNetworkDiscovery : MonoBehaviour
 	public void OnClientConnect (NetworkConnection conn)
 	{
 		if (!NetworkServer.active) {
-			SceneManager.Instance.LoadLobbyScreen ();
+			//SceneManager.Instance.LoadLobbyScreen ();
+			RoomUIController.Instance.UpdatePanelState (RoomUIController.State.Lobby);
 			MultiplayerLobbyManager.Instance.TryToAddPlayer ();
 		}
 	}

@@ -9,6 +9,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 486664}
   - 114: {fileID: 11425026}
+  - 114: {fileID: 11449686}
   m_Layer: 0
   m_Name: LobbyManager
   m_TagString: Untagged
@@ -47,11 +48,11 @@ MonoBehaviour:
   m_RunInBackground: 1
   m_ScriptCRCCheck: 1
   m_MaxDelay: 0.01
-  m_LogLevel: 0
+  m_LogLevel: 2
   m_PlayerPrefab: {fileID: 0}
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 0
-  m_OfflineScene: 02.FindRoom
+  m_OfflineScene: 02.Lobby
   m_OnlineScene: 
   m_SpawnPrefabs: []
   m_CustomConfig: 0
@@ -93,16 +94,31 @@ MonoBehaviour:
   matchMaker: {fileID: 0}
   matchName: default
   matchSize: 4
-  m_ShowLobbyGUI: 0
+  m_ShowLobbyGUI: 1
   m_MaxPlayers: 4
   m_MaxPlayersPerConnection: 1
-  m_MinPlayers: 2
-  m_LobbyPlayerPrefab: {fileID: 11412814, guid: 2a4ec5dbd04168e43a22744fe83e2ce9,
+  m_MinPlayers: 0
+  m_LobbyPlayerPrefab: {fileID: 11431014, guid: 2a4ec5dbd04168e43a22744fe83e2ce9,
     type: 2}
   m_GamePlayerPrefab: {fileID: 109860, guid: f55b571669d42a24fa17ad1b2989ea6a, type: 2}
-  m_LobbyScene: 02.FindRoom
+  m_LobbyScene: 02.Lobby
   m_PlayScene: 1.Maze
   lobbySlots: []
+--- !u!114 &11449686
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 106816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 227461547, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 0}
+  showGUI: 1
+  offsetX: 0
+  offsetY: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
