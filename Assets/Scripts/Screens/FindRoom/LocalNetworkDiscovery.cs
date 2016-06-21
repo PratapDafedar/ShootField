@@ -78,8 +78,9 @@ public class LocalNetworkDiscovery : MonoBehaviour
 		{
 			if (networkDiscovery.running)
 				networkDiscovery.StopBroadcast ();
-
-			MultiplayerLobbyManager.Instance.CreateServer();
+			networkDiscovery.Initialize ();
+			networkDiscovery.StartAsServer ();
+			MPLobbyManager.Instance.CreateServer();
 			GameManager.playerType = GameManager.PlayerType.Master;
 		}
 	}
@@ -101,8 +102,9 @@ public class LocalNetworkDiscovery : MonoBehaviour
 
 	public void ConnectToServer (string ip)
 	{
-		networkDiscovery.StopBroadcast ();
-		MultiplayerLobbyManager.Instance.JoinServer(ip, PortNumber);
+		if (networkDiscovery.running)
+			networkDiscovery.StopBroadcast ();
+		MPLobbyManager.Instance.JoinServer(ip, PortNumber);
 		GameManager.playerType = GameManager.PlayerType.Client;
 	}
 
@@ -111,7 +113,7 @@ public class LocalNetworkDiscovery : MonoBehaviour
 		if (!NetworkServer.active) {
 			//SceneManager.Instance.LoadLobbyScreen ();
 			RoomUIController.Instance.UpdatePanelState (RoomUIController.State.Lobby);
-			MultiplayerLobbyManager.Instance.TryToAddPlayer ();
+			//MultiplayerLobbyManager.Instance.TryToAddPlayer ();
 		}
 	}
 
@@ -128,7 +130,7 @@ public class LocalNetworkDiscovery : MonoBehaviour
 
 	public void OnServerDisConnect (NetworkConnection conn)
 	{		
-		SceneManager.Instance.LoadFindRoomScreen ();
+		SceneManager.Instance.LoadLobbyScreen ();
 	}
 
 	void OnDestroy ()

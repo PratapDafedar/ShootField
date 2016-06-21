@@ -6,7 +6,7 @@ using System.Collections;
 public class Player : NetworkLobbyPlayer
 {
 	[SyncVar]
-	public string _name;
+	public string playerName;
 
 	public SoldierController soldier;
 
@@ -15,7 +15,8 @@ public class Player : NetworkLobbyPlayer
 		Blue,
 		Red,
 	}
-	[SyncVar]
+
+	[SyncVar(hook = "OnTeamChange")]
 	public Team team;
 
 	[SyncVar]
@@ -24,9 +25,9 @@ public class Player : NetworkLobbyPlayer
 	[SyncVar]
 	public int score;
 
-	public Player (string name, Team team)
+	public void Init (string name, Team team)
 	{
-		this._name = name;
+		this.playerName = name;
 		this.team = team;
 	}
 
@@ -34,12 +35,27 @@ public class Player : NetworkLobbyPlayer
 	{
 		base.OnClientEnterLobby ();
 		Debug.Log ("OnClientEnterLobby");
+
+		//if (this.isLocalPlayer) 
+		{
+			playerName = GameManager.Instance.playerName;
+			team = GameManager.Instance.playerTeam;
+			id = "LobbyPlayer-" + this.netId;
+		}
+		this.gameObject.name = "LobbyPlayer-" + this.netId;
+		RoomUIController.Instance.UpdatePanelState (RoomUIController.State.Lobby);
+
+		MPLobbyManager.Instance.lobbyPlayerMap.Add (id, this);
+		RoomUIController.Instance.CreatePlayerList ();
 	}
 
 	public override void OnClientExitLobby()
 	{
 		base.OnClientExitLobby ();
 		Debug.Log ("OnClientExitLobby");
+
+		MPLobbyManager.Instance.lobbyPlayerMap.Remove (id);
+		RoomUIController.Instance.CreatePlayerList ();
 	}
 
 	public override void OnClientReady(bool readyState)
@@ -58,5 +74,11 @@ public class Player : NetworkLobbyPlayer
 	public void RpcStartGamePlay()
 	{
 		SceneManager.Instance.LoadGamePlayScreen ();
+	}
+
+	void OnTeamChange (Team team)
+	{
+		this.team = team;
+		RoomUIController.Instance.SwitchTeam ();
 	}
 }

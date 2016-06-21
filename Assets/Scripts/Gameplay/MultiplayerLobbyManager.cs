@@ -32,7 +32,7 @@ public class MultiplayerLobbyManager : NetworkLobbyManager
 	public void JoinServer(string ip, int port)
 	{
 		this.networkAddress = ip;
-		this.matchPort = port;
+		this.networkPort = port;
 		this.StartClient();
 	}
 
@@ -50,7 +50,7 @@ public class MultiplayerLobbyManager : NetworkLobbyManager
 	public void OnDestroyMatch(BasicResponse extendedInfo)
 	{
 		StopHost();
-		SceneManager.Instance.LoadFindRoomScreen ();
+		SceneManager.Instance.LoadLobbyScreen ();
 	}
 
 	// ----------------- Server callbacks ------------------

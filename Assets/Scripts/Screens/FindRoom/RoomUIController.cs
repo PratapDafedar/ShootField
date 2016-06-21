@@ -13,8 +13,16 @@ public class RoomUIController : MonoBehaviour
 	public RectTransform lobbyServerPanel;
 
 	public InputField portField;
+	public Toggle findRoomToggle;
+	public Toggle createRoomToggle;
 
 	public ServerInfoCell infoCellPrefab;
+
+	public GameObject playerCellPrefab;
+	public GameObject teamBlueTableParent;
+	public GameObject teamRedTableParent;
+
+	public List<PlayerCellView> playerCellList;
 
 	public enum State
 	{
@@ -31,6 +39,11 @@ public class RoomUIController : MonoBehaviour
 
 	void Start ()
 	{
+		Init ();
+	}
+
+	void Init ()
+	{
 		LocalNetworkDiscovery.Instance.StartAsClient ();
 		portField.text = LocalNetworkDiscovery.Instance.PortNumber.ToString ();
 	}
@@ -42,16 +55,21 @@ public class RoomUIController : MonoBehaviour
 
 	public void OnSelectFindServerTab ()
 	{
-		findServerPanel.gameObject.SetActive (true);
-		createServerPanel.gameObject.SetActive (false);
+		if (findRoomToggle.isOn) {
+			findServerPanel.gameObject.SetActive (true);
+			createServerPanel.gameObject.SetActive (false);
 
-		LocalNetworkDiscovery.Instance.StartAsClient ();
+			LocalNetworkDiscovery.Instance.StartAsClient ();
+		}
 	}
 
 	public void OnSelectCreateServerTab ()
 	{
-		findServerPanel.gameObject.SetActive (false);
-		createServerPanel.gameObject.SetActive (true);
+		if (createRoomToggle.isOn) 
+		{
+			findServerPanel.gameObject.SetActive (false);
+			createServerPanel.gameObject.SetActive (true);
+		}
 	}
 
 	public void OnSelectCreateServer ()
@@ -67,6 +85,12 @@ public class RoomUIController : MonoBehaviour
 	public void RefreshServer ()
 	{
 		LocalNetworkDiscovery.Instance.RefreshServer ();
+	}
+
+	public void OnLobbyDisconnectButtonPressed ()
+	{
+		UpdatePanelState (State.FindRoom);
+		MPLobbyManager.Instance.DisConnect ();
 	}
 
 	public void CreateServerList (Dictionary <string, NetworkBroadcastResult> broadCastResult)
@@ -104,23 +128,88 @@ public class RoomUIController : MonoBehaviour
 		findServerPanel.gameObject.SetActive (screenType == State.FindRoom);
 		createServerPanel.gameObject.SetActive (screenType == State.CreateRoom);
 		lobbyServerPanel.gameObject.SetActive (screenType == State.Lobby);
+
 		switch (screenType)
 		{
-		case State.CreateRoom:
-
-			break;
 		case State.FindRoom:
-
-
-
-
+			{				
+				findRoomToggle.isOn = true;
+			}
+			break;
+		case State.CreateRoom:
+			{
+				
+			}
 			break;
 		case State.Lobby:
-
-
-
-
+			{
+				
+			}
 			break;
 		}
+	}
+
+	public void CreatePlayerList()
+	{
+		ClearPlayerList ();
+		if (MPLobbyManager.Instance.lobbyPlayerMap == null)
+			return;
+		playerCellList = new List<PlayerCellView> ();
+		foreach (string playerId in MPLobbyManager.Instance.lobbyPlayerMap.Keys) 
+		{
+			Player player = MPLobbyManager.Instance.lobbyPlayerMap [playerId];
+			GameObject clone = Instantiate (playerCellPrefab) as GameObject;
+
+			clone.transform.SetParent (player.team == Player.Team.Red ? teamRedTableParent.transform : teamBlueTableParent.transform, false);
+
+			PlayerCellView playerCellView = clone.GetComponent<PlayerCellView> ();
+			playerCellView.AssignPlayerInfo (player.playerName, player.netId.ToString (), player);
+			playerCellList.Add (playerCellView);
+		}
+	}
+
+	public void OnDisconnectButtonPressed ()
+	{
+		if (NetworkManager.singleton != null) 
+		{
+			if (GameManager.playerType == GameManager.PlayerType.Master) {
+				NetworkManager.singleton.StopHost ();
+			} else if (GameManager.playerType == GameManager.PlayerType.Client) {
+				NetworkManager.singleton.client.Disconnect();
+			}
+		}
+		SceneManager.Instance.LoadLobbyScreen ();
+	}
+
+	public void OnPlayButtonPressed ()
+	{
+		SceneManager.Instance.LoadGamePlayScreen ();
+	}
+
+	public void ClearIndividualPlayerList(string id)
+	{
+		foreach (PlayerCellView playerCell in playerCellList)
+		{
+			if (playerCell.player.id == id) {
+				DestroyImmediate (playerCell.gameObject);
+				playerCellList.Remove (playerCell);
+			}
+		}
+	}
+
+	public void ClearPlayerList()
+	{
+		if (playerCellList != null) 
+		{
+			for (int i = 0; i < playerCellList.Count; i++) {
+				DestroyImmediate (playerCellList [i].gameObject);
+			}
+			playerCellList.Clear ();
+		}
+	}
+
+	public void SwitchTeam ()
+	{
+		RoomUIController.Instance.CreatePlayerList ();
 	}
 }

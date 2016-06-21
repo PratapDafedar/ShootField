@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 
-namespace TEST
+namespace Internal
 {
 	public class NetworkDiscovery : MonoBehaviour
 	{

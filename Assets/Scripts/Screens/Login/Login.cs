@@ -34,12 +34,11 @@ public class Login : MonoBehaviour
 			string name = usernameField.text;
 			Player.Team team = teamRed.isOn ? Player.Team.Red : Player.Team.Blue;
 
-			Player player = new Player (name, team);
+			GameManager.Instance.playerName = name;
+			GameManager.Instance.playerTeam = team;
 
-			GameManager.Instance.cPlayer = player;
-			SceneManager.Instance.LoadFindRoomScreen ();
-
-			PlayerPrefs.SetString ("PLAYER_NAME", player._name);
+			SceneManager.Instance.LoadLobbyScreen ();
+			PlayerPrefs.SetString ("PLAYER_NAME", name);
 			PlayerPrefs.SetInt ("TEAM_IS_BLUE", teamBlue.isOn ? 1 : 0);
 		} else {
 			invalidNameText.gameObject.SetActive (true);

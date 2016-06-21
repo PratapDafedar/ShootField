@@ -25,7 +25,7 @@ RenderSettings:
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 0
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -646,8 +646,8 @@ Camera:
   m_GameObject: {fileID: 437118801}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0.019607844}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -1140,48 +1140,121 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 672716767}
---- !u!1001 &728692412
-Prefab:
+--- !u!1 &713037242
+GameObject:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 486664, guid: fdf3850c16d54554d9d0785f0220e551, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 486664, guid: fdf3850c16d54554d9d0785f0220e551, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 486664, guid: fdf3850c16d54554d9d0785f0220e551, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 486664, guid: fdf3850c16d54554d9d0785f0220e551, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 486664, guid: fdf3850c16d54554d9d0785f0220e551, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 486664, guid: fdf3850c16d54554d9d0785f0220e551, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 486664, guid: fdf3850c16d54554d9d0785f0220e551, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 486664, guid: fdf3850c16d54554d9d0785f0220e551, type: 2}
-      propertyPath: m_RootOrder
-      value: 5
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: fdf3850c16d54554d9d0785f0220e551, type: 2}
-  m_IsPrefabParent: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 713037244}
+  - 114: {fileID: 713037243}
+  - 114: {fileID: 713037245}
+  m_Layer: 0
+  m_Name: CustomLobbyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &713037243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 713037242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -859942077, guid: 870353891bb340e2b2a9c8707e7419ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NetworkPort: 7777
+  m_ServerBindToIP: 0
+  m_ServerBindAddress: 
+  m_NetworkAddress: localhost
+  m_DontDestroyOnLoad: 1
+  m_RunInBackground: 1
+  m_ScriptCRCCheck: 1
+  m_MaxDelay: 0.01
+  m_LogLevel: 2
+  m_PlayerPrefab: {fileID: 0}
+  m_AutoCreatePlayer: 1
+  m_PlayerSpawnMethod: 0
+  m_OfflineScene: Lobby
+  m_OnlineScene: 
+  m_SpawnPrefabs: []
+  m_CustomConfig: 0
+  m_MaxConnections: 4
+  m_ConnectionConfig:
+    m_PacketSize: 1500
+    m_FragmentSize: 500
+    m_ResendTimeout: 1200
+    m_DisconnectTimeout: 2000
+    m_ConnectTimeout: 2000
+    m_MinUpdateTimeout: 10
+    m_PingTimeout: 500
+    m_ReducedPingTimeout: 100
+    m_AllCostTimeout: 20
+    m_NetworkDropThreshold: 5
+    m_OverflowDropThreshold: 5
+    m_MaxConnectionAttempt: 10
+    m_AckDelay: 33
+    m_MaxCombinedReliableMessageSize: 100
+    m_MaxCombinedReliableMessageCount: 10
+    m_MaxSentMessageQueueSize: 128
+    m_IsAcksLong: 0
+    m_UsePlatformSpecificProtocols: 0
+    m_Channels: []
+  m_GlobalConfig:
+    m_ThreadAwakeTimeout: 1
+    m_ReactorModel: 0
+    m_ReactorMaximumReceivedMessages: 1024
+    m_ReactorMaximumSentMessages: 1024
+    m_MaxPacketSize: 2000
+  m_Channels: 
+  m_UseWebSockets: 0
+  m_UseSimulator: 0
+  m_SimulatedLatency: 1
+  m_PacketLossPercentage: 0
+  m_MatchHost: mm.unet.unity3d.com
+  m_MatchPort: 443
+  isNetworkActive: 0
+  matchMaker: {fileID: 0}
+  matchName: default
+  matchSize: 4
+  m_ShowLobbyGUI: 0
+  m_MaxPlayers: 4
+  m_MaxPlayersPerConnection: 1
+  m_MinPlayers: 0
+  m_LobbyPlayerPrefab: {fileID: 11495128, guid: 2a4ec5dbd04168e43a22744fe83e2ce9,
+    type: 2}
+  m_GamePlayerPrefab: {fileID: 109860, guid: f55b571669d42a24fa17ad1b2989ea6a, type: 2}
+  m_LobbyScene: Lobby
+  m_PlayScene: Maze
+  lobbySlots: []
+--- !u!4 &713037244
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 713037242}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -13.507402, y: -1.1182873, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+--- !u!114 &713037245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 713037242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51426010a4d818849bcccb1a977f208a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &737923830
 GameObject:
   m_ObjectHideFlags: 0
@@ -1685,8 +1758,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: OnDisconnectButtonPressed
+      - m_Target: {fileID: 1438479774}
+        m_MethodName: OnLobbyDisconnectButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1852,8 +1925,8 @@ MonoBehaviour:
   m_UseNetworkManager: 1
   m_BroadcastData: HELLO
   m_ShowGUI: 0
-  m_OffsetX: 0
-  m_OffsetY: 0
+  m_OffsetX: 100
+  m_OffsetY: 100
 --- !u!114 &1016570316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2066,81 +2139,13 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 22462334, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_SizeDelta.y
-      value: -432.6935
-      objectReference: {fileID: 0}
     - target: {fileID: 22487296, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
       propertyPath: m_SizeDelta.y
-      value: -432.6935
+      value: -318.35483
       objectReference: {fileID: 0}
-    - target: {fileID: 11471552, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 11407260, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 11407260, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11407260, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.r
-      value: 0.26666668
-      objectReference: {fileID: 0}
-    - target: {fileID: 11407260, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.g
-      value: 0.27450982
-      objectReference: {fileID: 0}
-    - target: {fileID: 11407260, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.b
-      value: 0.2627451
-      objectReference: {fileID: 0}
-    - target: {fileID: 11426708, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.r
-      value: 0.26666668
-      objectReference: {fileID: 0}
-    - target: {fileID: 11426708, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.g
-      value: 0.27450982
-      objectReference: {fileID: 0}
-    - target: {fileID: 11426708, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.b
-      value: 0.2627451
-      objectReference: {fileID: 0}
-    - target: {fileID: 11426708, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11426708, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 22430478, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_AnchoredPosition.x
-      value: 0.6
-      objectReference: {fileID: 0}
-    - target: {fileID: 22430478, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_SizeDelta.x
-      value: -1.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 11471552, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11417986, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.r
-      value: 0.29803923
-      objectReference: {fileID: 0}
-    - target: {fileID: 11417986, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.g
-      value: 0.6392157
-      objectReference: {fileID: 0}
-    - target: {fileID: 11417986, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
-      propertyPath: m_Color.b
-      value: 0.8470589
+    - target: {fileID: 22462334, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
+      propertyPath: m_SizeDelta.y
+      value: -318.35483
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
@@ -2366,6 +2371,10 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1258585433}
+--- !u!1 &1277343299 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 114234, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
+  m_PrefabInternal: {fileID: 1139271082}
 --- !u!1 &1313496989
 GameObject:
   m_ObjectHideFlags: 0
@@ -2644,7 +2653,13 @@ MonoBehaviour:
   createServerPanel: {fileID: 742245930}
   lobbyServerPanel: {fileID: 672716768}
   portField: {fileID: 483864407}
+  findRoomToggle: {fileID: 985248491}
+  createRoomToggle: {fileID: 1734890362}
   infoCellPrefab: {fileID: 1425586276}
+  playerCellPrefab: {fileID: 195608, guid: 607e4111a8c7e4acaa09387c003a591b, type: 2}
+  teamBlueTableParent: {fileID: 1277343299}
+  teamRedTableParent: {fileID: 1887552687}
+  playerCellList: []
   curState: 0
 --- !u!1 &1475245966
 GameObject:
@@ -3504,6 +3519,10 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1842172744}
+--- !u!1 &1887552687 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 170738, guid: 68f960a2289be442abcd1fadde1e6731, type: 2}
+  m_PrefabInternal: {fileID: 1139271082}
 --- !u!1 &1970067882
 GameObject:
   m_ObjectHideFlags: 0

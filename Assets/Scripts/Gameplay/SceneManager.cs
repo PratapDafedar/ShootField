@@ -14,19 +14,19 @@ public class SceneManager : MonoBehaviour
 		}
 	}
 
-	public void LoadFindRoomScreen()
+	public void LoadLobbyScreen()
 	{
-		LoadScene ("02.FindRoom");
+		LoadScene ("Lobby");
 	}
 
 	public void LoadLoginScreen()
 	{
-		LoadScene ("01.Login");
+		LoadScene ("Login");
 	}
 
 	public void LoadGamePlayScreen()
 	{
-		LoadScene ("1.Maze");
+		LoadScene ("Maze");
 	}
 
 	public void LoadScene (string scene)

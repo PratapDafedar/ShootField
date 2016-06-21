@@ -45,7 +45,7 @@ public class LobbyScreenController : MonoBehaviour
 				NetworkManager.singleton.client.Disconnect();
 			}
 		}
-		SceneManager.Instance.LoadFindRoomScreen ();
+		SceneManager.Instance.LoadLobbyScreen ();
 	}
 
 	public void OnPlayButtonPressed ()

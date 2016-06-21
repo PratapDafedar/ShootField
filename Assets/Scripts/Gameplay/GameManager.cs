@@ -5,12 +5,22 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour 
 {
 	public const string IP_ADDRESS = "127.0.0.1";
-	public const int PORT_NUM = 8888;
+	public const int PORT_NUM = 22222;
 	public const float COUNTDOWN_TIME = 5;
 	private const string PLAYER_ID_PREFIX = "Player ";
 
 	public static GameManager Instance;
-	public Player cPlayer;
+
+	public string playerName
+	{
+		get {
+			return PlayerPrefs.GetString ("PLAYER_NAME");
+		}
+		set {
+			PlayerPrefs.SetString ("PLAYER_NAME", value);
+		}
+	}
+	public Player.Team playerTeam;
 
 	private static Dictionary<string, SoldierController> playerDict;
 
