@@ -11,6 +11,7 @@ public class RoomUIController : MonoBehaviour
 	public RectTransform findServerPanel;
 	public RectTransform createServerPanel;
 	public RectTransform lobbyServerPanel;
+	public Button startButton;
 
 	public InputField portField;
 	public Toggle findRoomToggle;
@@ -143,7 +144,7 @@ public class RoomUIController : MonoBehaviour
 			break;
 		case State.Lobby:
 			{
-				
+				startButton.gameObject.SetActive (GameManager.playerType == GameManager.PlayerType.Master);
 			}
 			break;
 		}

@@ -11,13 +11,24 @@ public class GameManager : MonoBehaviour
 
 	public static GameManager Instance;
 
+	#if !UNITY_EDITOR
+	private string _playerName = "default";
+	#endif
 	public string playerName
 	{
 		get {
+			#if UNITY_EDITOR
 			return PlayerPrefs.GetString ("PLAYER_NAME");
+			#else
+			return _playerName;
+			#endif
 		}
 		set {
+			#if UNITY_EDITOR
 			PlayerPrefs.SetString ("PLAYER_NAME", value);
+			#else
+			_playerName = value;
+			#endif
 		}
 	}
 	public Player.Team playerTeam;
