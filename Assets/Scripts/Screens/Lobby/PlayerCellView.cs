@@ -35,7 +35,13 @@ public class PlayerCellView : MonoBehaviour
 
 	public void OnClickSwitchTeam()
 	{
-		player.team = (player.team == Player.Team.Blue) ? Player.Team.Red : Player.Team.Blue;
-		RoomUIController.Instance.SwitchTeam ();
+		if (GameManager.playerType == GameManager.PlayerType.Master) 
+		{
+			Player.Team team = (player.team == Player.Team.Blue) ? Player.Team.Red : Player.Team.Blue;
+			player.team = team;
+			RoomUIController.Instance.SwitchTeam ();
+		} else {
+			player.CmdSwitchTeam ();
+		}
 	}
 }

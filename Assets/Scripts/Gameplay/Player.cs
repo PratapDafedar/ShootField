@@ -2,7 +2,7 @@
 using UnityEngine.Networking;
 using System.Collections;
 
-[System.Serializable]
+[NetworkSettings(channel=1,sendInterval=0.2f)]
 public class Player : NetworkLobbyPlayer
 {
 	[SyncVar]
@@ -74,6 +74,13 @@ public class Player : NetworkLobbyPlayer
 	public void RpcStartGamePlay()
 	{
 		SceneManager.Instance.LoadGamePlayScreen ();
+	}
+
+	[Command]
+	public void CmdSwitchTeam() 
+	{
+		Player.Team team = (this.team == Player.Team.Blue) ? Player.Team.Red : Player.Team.Blue;
+		this.team = team;
 	}
 
 	void OnTeamChange (Team team)
