@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
 
 	public static GameManager Instance;
 
+	public Player localPlayer;
+
 	#if !UNITY_EDITOR
 	private string _playerName = "default";
 	#endif

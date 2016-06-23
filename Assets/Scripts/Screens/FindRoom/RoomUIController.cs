@@ -91,7 +91,7 @@ public class RoomUIController : MonoBehaviour
 	public void OnLobbyDisconnectButtonPressed ()
 	{
 		UpdatePanelState (State.FindRoom);
-		MPLobbyManager.Instance.DisConnect ();
+		MPLobbyManager.Instance.Disconnect ();
 	}
 
 	public void CreateServerList (Dictionary <string, NetworkBroadcastResult> broadCastResult)
@@ -185,6 +185,7 @@ public class RoomUIController : MonoBehaviour
 	public void OnPlayButtonPressed ()
 	{
 		SceneManager.Instance.LoadGamePlayScreen ();
+		//GameManager. RpcStartGamePlay ();
 	}
 
 	public void ClearIndividualPlayerList(string id)

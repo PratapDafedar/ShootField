@@ -2,10 +2,10 @@
 using UnityEngine.Networking;
 using System.Collections;
 
-[NetworkSettings(channel=1,sendInterval=0.2f)]
+//[NetworkSettings(channel=1,sendInterval=0.2f)]
 public class Player : NetworkLobbyPlayer
 {
-	[SyncVar]
+	[SyncVar(hook = "OnPlayerNameChange")]
 	public string playerName;
 
 	public SoldierController soldier;
@@ -34,18 +34,33 @@ public class Player : NetworkLobbyPlayer
 	public override void OnClientEnterLobby()
 	{
 		base.OnClientEnterLobby ();
-		Debug.Log ("OnClientEnterLobby");
+		Debug.Log (this.netId + ".OnClientEnterLobby : " + isLocalPlayer);
 
-		//if (this.isLocalPlayer) 
-		{
+		this.readyToBegin = true;
+		Invoke("UpdatePlayerStatus", 1f);
+	}
+
+	void UpdatePlayerStatus ()
+	{
+		Debug.Log (this.netId + ".UpdatePlayerStatus : " + isLocalPlayer);
+		RoomUIController.Instance.UpdatePanelState (RoomUIController.State.Lobby);
+		if (isLocalPlayer) {
 			playerName = GameManager.Instance.playerName;
 			team = GameManager.Instance.playerTeam;
-			id = "LobbyPlayer-" + this.netId;
+			GameManager.Instance.localPlayer = this;
+			if (GameManager.playerType == GameManager.PlayerType.Client) {
+				this.CmdUpdateName (playerName);
+			} 
+		} else {
+			OnPlayerUpdate ();
 		}
-		this.gameObject.name = "LobbyPlayer-" + this.netId;
-		RoomUIController.Instance.UpdatePanelState (RoomUIController.State.Lobby);
+	}
 
-		MPLobbyManager.Instance.lobbyPlayerMap.Add (id, this);
+	void OnPlayerUpdate ()
+	{
+		id = "LobbyPlayer-" + this.netId;
+		this.gameObject.name = "LobbyPlayer-" + this.netId;
+		MPLobbyManager.Instance.AddToLobby (id, this);
 		RoomUIController.Instance.CreatePlayerList ();
 	}
 
@@ -54,7 +69,7 @@ public class Player : NetworkLobbyPlayer
 		base.OnClientExitLobby ();
 		Debug.Log ("OnClientExitLobby");
 
-		MPLobbyManager.Instance.lobbyPlayerMap.Remove (id);
+		MPLobbyManager.Instance.RemoveFromLobby (id);
 		RoomUIController.Instance.CreatePlayerList ();
 	}
 
@@ -82,10 +97,31 @@ public class Player : NetworkLobbyPlayer
 		Player.Team team = (this.team == Player.Team.Blue) ? Player.Team.Red : Player.Team.Blue;
 		this.team = team;
 	}
+	
+	[Command]
+	public void CmdUpdateName(string playerName) 
+	{
+		Debug.Log ("Receive Name : " + playerName);
+		this.playerName = playerName;
+		OnPlayerUpdate ();
+	}
 
 	void OnTeamChange (Team team)
 	{
 		this.team = team;
 		RoomUIController.Instance.SwitchTeam ();
+	}
+
+	void OnPlayerNameChange (string playerName)
+	{
+		this.playerName = playerName;
+		OnPlayerUpdate ();
+	}
+
+	void OnDestroy ()
+	{
+		if (isLocalPlayer) {
+			MPLobbyManager.Instance.Disconnect ();
+		}
 	}
 }

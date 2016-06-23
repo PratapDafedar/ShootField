@@ -27,12 +27,13 @@ public class PlayerCellView : MonoBehaviour
 
 	void RefreshDataWithDelay ()
 	{
-		switchButton.gameObject.SetActive (player.isLocalPlayer);
-		if (player.isLocalPlayer) {
-			playerName.color = serialNumber.color = Color.cyan;
+		if (this != null) {
+			switchButton.gameObject.SetActive (player.isLocalPlayer);
+			if (player.isLocalPlayer) {
+				playerName.color = serialNumber.color = Color.cyan;
+			}
 		}
 	}
-
 	public void OnClickSwitchTeam()
 	{
 		if (GameManager.playerType == GameManager.PlayerType.Master) 

@@ -15,13 +15,18 @@ public class Login : MonoBehaviour
 
     void Start()
     {
+		int isBlue = 0;
+		#if UNITY_EDITOR
         string savedName = PlayerPrefs.GetString("PLAYER_NAME");
         if (savedName != null && savedName != "")
         {
             usernameField.text = savedName;
         }
+		isBlue = PlayerPrefs.GetInt("TEAM_IS_BLUE");
+		#else
+		usernameField.text = GameManager.Instance.playerName;
+		#endif
 
-        int isBlue = PlayerPrefs.GetInt("TEAM_IS_BLUE");
         teamBlue.isOn = (isBlue == 1) ? true : false;
         teamRed.isOn = (isBlue == 0) ? true : false;
     }
@@ -32,14 +37,16 @@ public class Login : MonoBehaviour
 		          usernameField.text != "" &&
 		          IsValidUsername (usernameField.text)) {
 			string name = usernameField.text;
-			Player.Team team = teamRed.isOn ? Player.Team.Red : Player.Team.Blue;
+			//Player.Team team = teamRed.isOn ? Player.Team.Red : Player.Team.Blue;
 
 			GameManager.Instance.playerName = name;
-			GameManager.Instance.playerTeam = team;
+			//GameManager.Instance.playerTeam = team;
 
 			SceneManager.Instance.LoadLobbyScreen ();
+			#if UNITY_EDITOR
 			PlayerPrefs.SetString ("PLAYER_NAME", name);
 			PlayerPrefs.SetInt ("TEAM_IS_BLUE", teamBlue.isOn ? 1 : 0);
+			#endif
 		} else {
 			invalidNameText.gameObject.SetActive (true);
 		}

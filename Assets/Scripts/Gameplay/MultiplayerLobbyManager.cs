@@ -79,6 +79,7 @@ public class MultiplayerLobbyManager : NetworkLobbyManager
 
 	public override void OnLobbyServerPlayerRemoved(NetworkConnection conn, short playerControllerId)
 	{
+		Debug.LogError ("OnLobbyServerPlayerRemoved");
 		for (int i = 0; i < lobbySlots.Length; ++i)
 		{
 			Player p = lobbySlots[i] as Player;
@@ -93,6 +94,7 @@ public class MultiplayerLobbyManager : NetworkLobbyManager
 
 	public override void OnLobbyServerDisconnect(NetworkConnection conn)
 	{
+		Debug.LogError ("OnLobbyServerDisconnect");
 		for (int i = 0; i < lobbySlots.Length; ++i)
 		{
 			Player p = lobbySlots[i] as Player;
@@ -107,6 +109,7 @@ public class MultiplayerLobbyManager : NetworkLobbyManager
 
 	public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
 	{
+		Debug.LogError ("OnLobbyServerSceneLoadedForPlayer");
 		//This hook allows you to apply state data from the lobby-player to the game-player
 		//just subclass "LobbyHook" and add it to the lobby object.
 
@@ -118,55 +121,7 @@ public class MultiplayerLobbyManager : NetworkLobbyManager
 
 	// --- Countdown management
 
-	public override void OnLobbyServerPlayersReady()
-	{
-		bool allready = true;
-		for(int i = 0; i < lobbySlots.Length; ++i)
-		{
-			if(lobbySlots[i] != null)
-				allready &= lobbySlots[i].readyToBegin;
-		}
 
-		if(allready)
-			StartCoroutine(ServerCountdownCoroutine());
-	}
-
-	public IEnumerator ServerCountdownCoroutine()
-	{
-		float remainingTime = GameManager.COUNTDOWN_TIME;
-		int floorTime = Mathf.FloorToInt(remainingTime);
-
-		while (remainingTime > 0)
-		{
-			yield return null;
-
-			remainingTime -= Time.deltaTime;
-			int newFloorTime = Mathf.FloorToInt(remainingTime);
-
-			if (newFloorTime != floorTime)
-			{//to avoid flooding the network of message, we only send a notice to client when the number of plain seconds change.
-				floorTime = newFloorTime;
-
-				for (int i = 0; i < lobbySlots.Length; ++i)
-				{
-					if (lobbySlots[i] != null)
-					{//there is maxPlayer slots, so some could be == null, need to test it before accessing!
-						(lobbySlots[i] as Player).RpcUpdateCountdown(floorTime);
-					}
-				}
-			}
-		}
-
-		for (int i = 0; i < lobbySlots.Length; ++i)
-		{
-			if (lobbySlots[i] != null)
-			{
-				(lobbySlots[i] as Player).RpcStartGamePlay();
-			}
-		}
-
-		ServerChangeScene(playScene);
-	}
 
 	// ----------------- Client callbacks ------------------
 
