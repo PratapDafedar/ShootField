@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &155822
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,7 +234,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Rahul
+  m_Text: Rahulxcdsxzvxzvcxv
 --- !u!114 &11449018
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -419,10 +419,10 @@ RectTransform:
   - {fileID: 22453564}
   m_Father: {fileID: 22490074}
   m_RootOrder: 0
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1.0000037, y: 0.5}
-  m_AnchoredPosition: {x: -29, y: 0}
-  m_SizeDelta: {x: 58, y: 40}
+  m_AnchorMin: {x: 0.7210576, y: 0}
+  m_AnchorMax: {x: 1.0000037, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &22453564
 RectTransform:
@@ -437,10 +437,10 @@ RectTransform:
   - {fileID: 22465928}
   m_Father: {fileID: 22451462}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0.003847458, y: -0.0038453944}
-  m_AnchorMax: {x: 1.0006998, y: 1.0017039}
-  m_AnchoredPosition: {x: 0.0000009536743, y: 0}
-  m_SizeDelta: {x: 0.0000019073486, y: 0}
+  m_AnchorMin: {x: 0.0030769065, y: -0.0038453944}
+  m_AnchorMax: {x: 0.37579697, y: 1.0017039}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &22454058
 RectTransform:
@@ -454,10 +454,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 22490074}
   m_RootOrder: 2
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 106.5, y: -2}
-  m_SizeDelta: {x: 121, y: 26}
+  m_AnchorMin: {x: 0.2212302, y: 0.125}
+  m_AnchorMax: {x: 0.8031618, y: 0.775}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &22454666
 RectTransform:
@@ -471,10 +471,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 22490074}
   m_RootOrder: 1
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 23.5, y: -2.5}
-  m_SizeDelta: {x: 35, y: 25}
+  m_AnchorMin: {x: 0.028856112, y: 0.125}
+  m_AnchorMax: {x: 0.19718343, y: 0.75}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &22465928
 RectTransform:

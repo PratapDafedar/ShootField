@@ -43,7 +43,7 @@ public class OnScreenLogger : MonoBehaviour {
 	
 	void OnGUI ()
 	{
-		isDebugging = GUI.Toggle (new Rect (Screen.width * 0.4f, Screen.height - 25, 100, 25), isDebugging, "Debug");
+		isDebugging = GUI.Toggle (new Rect (Screen.width * 0.01f, Screen.height - 25, 100, 25), isDebugging, "Debug");
 
 		if (! isDebugging)
 			return;
@@ -54,7 +54,7 @@ public class OnScreenLogger : MonoBehaviour {
 		GUILayout.EndScrollView ();
 		GUILayout.EndArea ();
 
-		if (GUI.Button (new Rect (Screen.width * 0.6f, Screen.height - 50, 80, 40), "clear")) {
+		if (GUI.Button (new Rect (Screen.width * 0.1f, Screen.height - 50, 80, 40), "clear")) {
 			streamingError = "";
 		}
 	}
