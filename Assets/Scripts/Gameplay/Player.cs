@@ -47,7 +47,7 @@ public class Player : NetworkLobbyPlayer
 		if (isLocalPlayer) {
 			playerName = GameManager.Instance.playerName;
 			team = GameManager.Instance.playerTeam;
-			GameManager.Instance.localPlayer = this;
+			GameManager.Instance.localLobbyPlayer = this;
 			if (GameManager.playerType == GameManager.PlayerType.Client) {
 				this.CmdUpdateName (playerName);
 			} 
@@ -69,8 +69,8 @@ public class Player : NetworkLobbyPlayer
 		base.OnClientExitLobby ();
 		Debug.Log ("OnClientExitLobby");
 
-		MPLobbyManager.Instance.RemoveFromLobby (id);
-		RoomUIController.Instance.CreatePlayerList ();
+//		MPLobbyManager.Instance.RemoveFromLobby (id);
+//		RoomUIController.Instance.CreatePlayerList ();
 	}
 
 	public override void OnClientReady(bool readyState)
@@ -120,8 +120,7 @@ public class Player : NetworkLobbyPlayer
 
 	void OnDestroy ()
 	{
-		if (isLocalPlayer) {
-			MPLobbyManager.Instance.Disconnect ();
-		}
+		//lobby exit clean-ups here.
+
 	}
 }

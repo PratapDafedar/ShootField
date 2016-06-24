@@ -38,6 +38,10 @@ public class CameraFollow : MonoBehaviour
 		Instance = this;
 
 		Application.targetFrameRate = 50;
+		if (GameManager.Instance != null && 
+			GameManager.Instance.localPlayer != null) {
+			target = GameManager.Instance.localPlayer;
+		}
 	}
 
     private void Init ()

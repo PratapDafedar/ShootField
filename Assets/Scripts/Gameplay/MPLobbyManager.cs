@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 
-public class MPLobbyManager : MonoBehaviour 
+public class MPLobbyManager : NetworkLobbyManager 
 {
 	public static MPLobbyManager Instance;
 
@@ -11,13 +11,9 @@ public class MPLobbyManager : MonoBehaviour
 
 	private NetworkLobbyManager networkLobbyManager;
 
-	void Awake ()
-	{
-		Instance = this;
-	}
-
 	void Start ()
 	{
+		Instance = this;
 		lobbyPlayerMap = new Dictionary<string, Player> ();
 		networkLobbyManager = NetworkLobbyManager.singleton as NetworkLobbyManager;
 	}
@@ -27,15 +23,24 @@ public class MPLobbyManager : MonoBehaviour
 		networkLobbyManager.networkAddress = ip;
 		networkLobbyManager.matchPort = port;
 		networkLobbyManager.StartClient();
+		networkLobbyManager.client.RegisterHandler (MsgType.Connect, OnConnect);
+		networkLobbyManager.client.RegisterHandler (MsgType.Disconnect, OnDisconnect);
 	}
 
 	public void CreateServer()
 	{
 		networkLobbyManager.matchPort = LocalNetworkDiscovery.Instance.PortNumber;
 		networkLobbyManager.StartHost ();
+		networkLobbyManager.client.RegisterHandler (MsgType.Connect, OnConnect);
+		networkLobbyManager.client.RegisterHandler (MsgType.Disconnect, OnDisconnect);
 	}
 
-	public void Disconnect ()
+	public void OnConnect (NetworkMessage netMsg)
+	{
+		networkLobbyManager.TryToAddPlayer ();
+	}
+
+	public void OnDisconnect (NetworkMessage netMsg)
 	{
 		if (networkLobbyManager != null) 
 		{
@@ -46,20 +51,6 @@ public class MPLobbyManager : MonoBehaviour
 			}
 			GameManager.playerType = GameManager.PlayerType.None;
 		}
-	}
-
-	public void OnLobbyServerPlayersReady()
-	{
-		Debug.LogError ("OnLobbyServerPlayersReady");
-		bool allready = true;
-		for(int i = 0; i < networkLobbyManager.lobbySlots.Length; ++i)
-		{
-			if(networkLobbyManager.lobbySlots[i] != null)
-				allready &= networkLobbyManager.lobbySlots[i].readyToBegin;
-		}
-
-		if(allready)
-			StartCoroutine(ServerCountdownCoroutine());
 	}
 
 	public void AddToLobby (string id, Player player)
@@ -76,40 +67,41 @@ public class MPLobbyManager : MonoBehaviour
 		}
 	}
 
-	public IEnumerator ServerCountdownCoroutine()
+	public void LoadGameScene ()
 	{
-		float remainingTime = GameManager.COUNTDOWN_TIME;
-		int floorTime = Mathf.FloorToInt(remainingTime);
+		GameManager.Instance.localLobbyPlayer.RpcStartGamePlay ();
+		//ServerChangeScene (playScene);
+	}
 
-		while (remainingTime > 0)
-		{
-			yield return null;
+	public override bool OnLobbyServerSceneLoadedForPlayer(GameObject lobbyPlayer, GameObject gamePlayer)
+	{
+		Debug.Log (lobbyPlayer.name + " : Adding player : " + gamePlayer.name);
+		SoldierController soldierController = gamePlayer.GetComponent <SoldierController> ();
+		Player playerInfo = lobbyPlayer.GetComponent<Player> ();
+		soldierController.player = playerInfo;
 
-			remainingTime -= Time.deltaTime;
-			int newFloorTime = Mathf.FloorToInt(remainingTime);
-
-			if (newFloorTime != floorTime)
-			{//to avoid flooding the network of message, we only send a notice to client when the number of plain seconds change.
-				floorTime = newFloorTime;
-
-				for (int i = 0; i < networkLobbyManager.lobbySlots.Length; ++i)
-				{
-					if (networkLobbyManager.lobbySlots[i] != null)
-					{//there is maxPlayer slots, so some could be == null, need to test it before accessing!
-						(networkLobbyManager.lobbySlots[i] as Player).RpcUpdateCountdown(floorTime);
-					}
-				}
-			}
+		if (playerInfo.team == Player.Team.Blue) {
+			gamePlayer.transform.position = SpawnManager.Instance.spawnPointTeamA [Random.Range (0, SpawnManager.Instance.spawnPointTeamA.Length)].position;
+		} 
+		else {
+			gamePlayer.transform.position = SpawnManager.Instance.spawnPointTeamB [Random.Range (0, SpawnManager.Instance.spawnPointTeamB.Length)].position;
 		}
-
-		for (int i = 0; i < networkLobbyManager.lobbySlots.Length; ++i)
-		{
-			if (networkLobbyManager.lobbySlots[i] != null)
-			{
-				(networkLobbyManager.lobbySlots[i] as Player).RpcStartGamePlay();
-			}
+		gamePlayer.SetActive (true);
+		if (playerInfo.isLocalPlayer) {
+			CameraFollow.Instance.target = gamePlayer.transform;
 		}
+		return false;
+	}
 
-		networkLobbyManager.ServerChangeScene(networkLobbyManager.playScene);
+	public override GameObject OnLobbyServerCreateGamePlayer (NetworkConnection conn, short playerControllerId)
+	{
+		Debug.Log ("OnLobbyServerCreateGamePlayer : " + playerControllerId);
+		GameObject player = Instantiate(gamePlayerPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+		return player;
+	}
+
+	public override void OnServerSceneChanged (string sceneName)
+	{
+		Debug.Log ("OnServerSceneChanged : " + sceneName);
 	}
 }

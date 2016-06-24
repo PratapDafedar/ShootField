@@ -11,3 +11,7 @@ EditorBuildSettings:
     path: Assets/Scene/Lobby.unity
   - enabled: 1
     path: Assets/Scene/Level/Maze.unity
+  - enabled: 1
+    path: Assets/SampleScenes/Scenes/NetworkLobby.unity
+  - enabled: 1
+    path: Assets/SampleScenes/Scenes/NetworkSpaceship.unity

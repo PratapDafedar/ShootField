@@ -2,18 +2,18 @@
 using UnityEngine.Networking;
 using System.Collections;
 
-[RequireComponent(typeof(PlayerMoveController))]
-[RequireComponent(typeof(Health))]
+//[RequireComponent(typeof(PlayerMoveController))]
+//[RequireComponent(typeof(Health))]
 public class SoldierController : NetworkBehaviour 
 {
 	[SyncVar]
 	private int currentHealth;
 	
 	[SyncVar]
-	private bool isDead;
+	public bool isDead;
 	
 	[SerializeField]
-	private Player player;
+	public Player player;
 	
 	[SerializeField]
 	private int maxHealth = 100;
@@ -73,8 +73,8 @@ public class SoldierController : NetworkBehaviour
 	}
 
 	// When we are destroyed
-	void OnDisable ()
-	{
-		GameManager.UnRegisterPlayer(transform.name);
-	}
+//	void OnDisable ()
+//	{
+//		GameManager.UnRegisterPlayer(transform.name);
+//	}
 }

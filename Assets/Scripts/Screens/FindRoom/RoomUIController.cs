@@ -91,7 +91,7 @@ public class RoomUIController : MonoBehaviour
 	public void OnLobbyDisconnectButtonPressed ()
 	{
 		UpdatePanelState (State.FindRoom);
-		MPLobbyManager.Instance.Disconnect ();
+		MPLobbyManager.Instance.OnDisconnect (null);
 	}
 
 	public void CreateServerList (Dictionary <string, NetworkBroadcastResult> broadCastResult)
@@ -185,7 +185,7 @@ public class RoomUIController : MonoBehaviour
 	public void OnPlayButtonPressed ()
 	{
 		SceneManager.Instance.LoadGamePlayScreen ();
-		//GameManager. RpcStartGamePlay ();
+		MPLobbyManager.Instance.LoadGameScene ();
 	}
 
 	public void ClearIndividualPlayerList(string id)
@@ -204,7 +204,9 @@ public class RoomUIController : MonoBehaviour
 		if (playerCellList != null) 
 		{
 			for (int i = 0; i < playerCellList.Count; i++) {
-				DestroyImmediate (playerCellList [i].gameObject);
+				if (playerCellList [i] != null) {
+					DestroyImmediate (playerCellList [i].gameObject);
+				}
 			}
 			playerCellList.Clear ();
 		}

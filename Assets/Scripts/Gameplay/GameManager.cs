@@ -11,7 +11,8 @@ public class GameManager : MonoBehaviour
 
 	public static GameManager Instance;
 
-	public Player localPlayer;
+	public Player localLobbyPlayer;
+	public Transform localPlayer;
 
 	#if !UNITY_EDITOR
 	private string _playerName = "default";
@@ -86,7 +87,7 @@ public class GameManager : MonoBehaviour
 
 		foreach (string _playerID in playerDict.Keys)
 		{
-			GUILayout.Label(_playerID + "  -  " + playerDict[_playerID].transform.name);
+			//GUILayout.Label(_playerID + "  -  " + playerDict[_playerID].transform.name);
 		}
 
 		GUILayout.EndVertical();

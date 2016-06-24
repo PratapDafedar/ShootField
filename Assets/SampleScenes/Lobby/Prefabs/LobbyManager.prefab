@@ -604,6 +604,7 @@ GameObject:
   - 114: {fileID: 11466428}
   - 114: {fileID: 11475086}
   - 114: {fileID: 11415508}
+  - 114: {fileID: 11455866}
   m_Layer: 5
   m_Name: LobbyManager
   m_TagString: Untagged
@@ -1159,7 +1160,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 0
-  m_Text: NETWORK LOBBY EXAMPLE
+  m_Text: Net Meteoroid
 --- !u!114 &11403610
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2595,6 +2596,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 1
+--- !u!114 &11455866
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 155310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5d15f2051d09644ebccdef0f54b7bbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11456716
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3236,14 +3248,14 @@ MonoBehaviour:
   matchName: default
   matchSize: 4
   m_ShowLobbyGUI: 0
-  m_MaxPlayers: 3
+  m_MaxPlayers: 4
   m_MaxPlayersPerConnection: 2
-  m_MinPlayers: 2
+  m_MinPlayers: 1
   m_LobbyPlayerPrefab: {fileID: 11487034, guid: ad727d7e1462ecc4f83c898ecc501997,
     type: 2}
-  m_GamePlayerPrefab: {fileID: 0}
-  m_LobbyScene: 
-  m_PlayScene: 
+  m_GamePlayerPrefab: {fileID: 111598, guid: e1ae9de1b8dd57e41918d7f8b76a310d, type: 2}
+  m_LobbyScene: NetworkLobby
+  m_PlayScene: NetworkSpaceship
   lobbySlots: []
   prematchCountdown: 3
   topPanel: {fileID: 11424994}
