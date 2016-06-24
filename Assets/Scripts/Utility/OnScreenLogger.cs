@@ -19,6 +19,8 @@ public class OnScreenLogger : MonoBehaviour {
 		else {
 			DestroyImmediate (this);
 		}
+
+		StandaloneWindowsUtility.SetWindowPosition (0, 150);
 	}
 	
 	void Start ()
