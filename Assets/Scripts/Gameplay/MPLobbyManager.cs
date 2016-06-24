@@ -99,9 +99,4 @@ public class MPLobbyManager : NetworkLobbyManager
 		GameObject player = Instantiate(gamePlayerPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 		return player;
 	}
-
-	public override void OnServerSceneChanged (string sceneName)
-	{
-		Debug.Log ("OnServerSceneChanged : " + sceneName);
-	}
 }
