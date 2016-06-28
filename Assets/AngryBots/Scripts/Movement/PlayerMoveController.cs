@@ -25,7 +25,7 @@ public class PlayerMoveController : MonoBehaviour
     // Private memeber data
     private Camera mainCamera;
 
-    private Transform cursorObject;
+    public Transform cursorObject;
     private Joystick joystickLeft;
     private Joystick joystickRight;
 
